@@ -19,6 +19,8 @@ module ArcadeProject::CategoryRoot
 
     function onInitialize(context)
     {
+        context.cursor_visible = true;
+
         var single_race = GameRoot::current_game == "SingleRace";
         var split_battle = GameRoot::current_game == "SplitBattle";
         

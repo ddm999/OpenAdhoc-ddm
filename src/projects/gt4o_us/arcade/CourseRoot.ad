@@ -6,15 +6,6 @@ module ArcadeProject::CourseRoot
     static current_reverse = nil;
     static watcher = nil;
 
-    function setFadeActor(widget)
-    {
-        var actor = main::menu::MFadeActor(widget, 1.0);
-        widget.actor = actor;
-        widget.actor.period = 1.0;
-        widget.actor.out = false;
-        widget.actor.warp();
-    }
-
     function setFadeActor2(widget)
     {
         var actor = main::menu::MFadeActor(widget, 1.0);
@@ -30,7 +21,19 @@ module ArcadeProject::CourseRoot
         var actor = main::menu::MFadeActor(widget, 1.0);
         widget.actor = actor;
         widget.actor.period = 0.5;
-        widget.actor.repeat = true;
+        widget.actor.out = true;
+        widget.actor.warp();
+        widget.actor.out = false;
+    }
+
+    function setFadeActor4(widget)
+    {
+        var actor = main::menu::MFadeActor(widget, 1.0);
+        widget.actor = actor;
+        widget.actor.period = 1.5;
+        widget.actor.out = true;
+        widget.actor.warp();
+        widget.actor.out = false;
     }
 
     function setMoveActor(widget, x, y)
@@ -42,23 +45,13 @@ module ArcadeProject::CourseRoot
         widget.actor.warp();
     }
 
-    function setMoveArrowActor(widget, y)
-    {
-        var actor = main::menu::MMoveActor(widget, widget.x, widget.y + y);
-        widget.actor = actor;
-        widget.actor.ratio = 0.2;
-        widget.actor.out = false;
-        widget.actor.warp();
-    }
-
-    setFadeActor(Name);
-    setFadeActor(Caption);
+    setFadeActor2(Details);
     setFadeActor2(Course::Logo);
     setFadeActor2(Photo::Logo);
-    setMoveActor(Map, 160.0, 0.0);
-    setFadeActor3(CrsScroll::dec_arrow::bga);
-    setFadeActor3(CrsScroll::inc_arrow::bga);
-    setMoveActor(CrsScroll, 0.0, 250.0);
+    setMoveActor(Map, 0.0, 160.0);
+    setFadeActor3(ImgHolder);
+    setMoveActor(ImgHolder::CrsImage1, -160.0, 0.0);
+    setMoveActor(ImgHolder::CrsImage2, 160.0, 0.0);
     setMoveActor(DirScroll, 0.0, 250.0);
 
     function buildFavoriteCourse()
@@ -167,35 +160,20 @@ module ArcadeProject::CourseRoot
         GameRoot::initialize_race_setting();
 
         hidden.visible = false;
-        context.cursor_visible = true;
+        context.cursor_visible = false;
 
         var category = setCourseList();
-
-        if (main::menu::MSystem::GetVersionBranch() == "vdim")
-        {
-            Mpeg.visible = false;
-            Course::hidemovie0.visible = false;
-            Course::hidemovie1.visible = false;
-            Course::hidemovie2.visible = false;
-            Course::hidemovie3.visible = false;
-        }
-        else 
-            BG.visible = false;
 
         ToolTip::tip.remove();
 
         if (GameRoot::current_game == "PhotoMode")
         {
-            Mpeg.visible = false;
-            Mpeg.interlace = false;
             Course.visible = false;
             Photo.visible = true;
             ToolTip::tip.key = "photomode_description";
         }
         else 
         {
-            Mpeg.visible = true;
-            Mpeg.interlace = true;
             Course.visible = true;
             Photo.visible = false;
             ToolTip::tip.value = "";
@@ -218,8 +196,6 @@ module ArcadeProject::CourseRoot
             var crs = current_crslist[i].code;
             var item = hidden::Item.doCopy();
 
-            var path = "image/piece/crs_mini/" + crs + ".png";
-            item["bg"].image_path = path;
             var crsname = context.translate(ROOT, "CourseNameShort", crs);
             item["label"].text = crsname;
             item.defineStatic("course", crs);
@@ -239,14 +215,11 @@ module ArcadeProject::CourseRoot
         }
 
         DirScroll::SelectBox.index = 0;
-        CrsScroll.actor.out = true;
-        CrsScroll.actor.warp();
-        CrsScroll.actor.out = false;
         DirScroll.actor.out = true;
         DirScroll.actor.warp();
         CrsScroll::SelectBox.callFocus(ROOT);
         DirScroll::SelectBox.outFocus(ROOT);
-        
+
         set_crs(context);
 
         if (GameRoot::current_game == "SplitBattle")
@@ -330,19 +303,11 @@ module ArcadeProject::CourseRoot
             logo = Course::Logo;
 
         var index = CrsScroll::SelectBox.index;
+        var insert_origin = index < current_crs_index ? -160.0 : 160.0;
         current_crs_index = index;
         current_crs = current_crslist[index].code;
 
         var name = current_crs;
-
-        if (Mpeg.visible)
-            Mpeg.movie_name = name;
-        
-        if (BG.visible)
-        {
-            BG.image_path = "image/arcade/crs/" + name + ".png";
-            BG.doInitialize(context);
-        }
 
         logo.actor.out = true;
         logo.actor.warp();
@@ -358,47 +323,71 @@ module ArcadeProject::CourseRoot
         if (!photo_mode)
         {
             Map.visible = true;
+            Map.actor.destinationY = 176 + insert_origin;
             Map.actor.out = true;
             Map.actor.warp();
             Map.image_path = "image/piece/crs_map/" + name + ".png";
             Map.doInitialize(context);
 
+            ImgHolder::CrsImage1.visible = false;
+            print "[ddm!!!] course maxi load";
+            ImgHolder::CrsImage1.setImagePath("image/piece/crs_maxi/" + name + "_1.img");
+            ImgHolder::CrsImage2.setImagePath("image/piece/crs_maxi/" + name + "_2.img");
+
+            print "[ddm!!!] course maxi initialize";
+            ImgHolder::CrsImage1.doInitialize(context);
+            ImgHolder::CrsImage2.doInitialize(context);
+
+            ImgHolder::CrsImage1.adjustSize();
+
+            if (wide)
+            {
+                print "[ddm!!!] HEEELP HELP MEEE %{ImgHolder::CrsImage1.w}";
+            }
+
+            print "[ddm!!!] course maxi actor setup";
+            ImgHolder.actor.out = true;
+            ImgHolder.actor.warp();
+            ImgHolder::CrsImage1.visible = true;
+            ImgHolder::CrsImage1.actor.out = true;
+            ImgHolder::CrsImage1.actor.warp();
+            ImgHolder::CrsImage2.actor.out = true;
+            ImgHolder::CrsImage2.actor.warp();
+
+            Details.actor.out = true;
+            Details.actor.warp();
+
             import main::menu::MUnit;
 
             if (main::menu::MSystem::GetVersionBranch() != "vdim")
             {
-                var text = context.translate(ROOT, "course_spec");
-                ToolTip::tip.value = text.format(MUnit::GetCourseLengthString(current_crslist[index].length), MUnit::GetCourseHeightString(current_crslist[index].height));
+                Details::Length.text = "Course length: %s".format(
+                    MUnit::GetCourseLengthString(current_crslist[index].length)
+                );
+                Details::Height.text = "Elevation change: %s".format(
+                    MUnit::GetCourseHeightString(current_crslist[index].height)
+                );
             }
             else
-                ToolTip::tip.value = context.translate(ROOT, "doc_" + current_crslist[index].code);
+                Details.text = "";
         }
         else
-            Map.visible = false;
-
-        Name.text = context.translate(ROOT, "CourseNameTitle", name);
-        Name.adjustScale();
-        Name.actor.over = 2.0;
-        Name.actor.out = false;
-        Name.actor.warp();
-        Name.actor.out = true;
-
-        if (main::menu::MSystem::GetRegionCode() == "jp" || main::menu::MSystem::GetRegionCode() == "tw" || main::menu::MSystem::GetRegionCode() == "kr")
         {
-            Caption.text = context.translate(ROOT, "CourseNameCaption", name);
-            Caption.adjustScale();
-            Caption.actor.over = 2.0;
-            Caption.actor.out = false;
-            Caption.actor.warp();
-            Caption.actor.out = true;
+            Map.visible = false;
         }
-        else
-            Caption.visible = false;
 
+        ToolTip::tip.value = context.translate(ROOT, "CourseNameTitle", name);
+
+        Details.actor.out = false;
         logo.actor.out = false;
 
         if (!photo_mode)
+        {
+            ImgHolder.actor.out = false;
+            ImgHolder::CrsImage1.actor.out = false;
+            ImgHolder::CrsImage2.actor.out = false;
             Map.actor.out = false;
+        }
     }
 
     function getCurrentCourse()
@@ -432,7 +421,9 @@ module ArcadeProject::CourseRoot
                 context.startPage(TopRoot, GameRoot);
             }
             else
+            {
                 start_page(context, CategoryRoot);
+            }
         }
 
         return EVENTRESULT_FILTER;
@@ -515,10 +506,9 @@ module ArcadeProject::CourseRoot::CrsScroll::SelectBox
     {
         main::sound.play("ok");
 
-        CrsScroll.actor.out = true;
-
         if (current_crslist[SelectBox.index].has_reverse)
         {
+            context.cursor_visible = true;
             DirScroll.actor.out = false;
             CrsScroll::SelectBox.outFocus(ROOT);
             DirScroll::SelectBox.callFocus(ROOT);
@@ -538,7 +528,6 @@ module ArcadeProject::CourseRoot::DirScroll::SelectBox
     {
         main::sound.play("cancel");
         DirScroll.actor.out = true;
-        CrsScroll.actor.out = false;
         SelectBox.outFocus(ROOT);
         CrsScroll::SelectBox.callFocus(ROOT);
 
@@ -581,6 +570,7 @@ module ArcadeProject::CourseRoot::hidden::Item
     function onFocusEnter(context)
     {
         var widget = ROOT.getFocusedWidget();
+        context.cursor_visible = false;
 
         if (widget == nil)
             return false;

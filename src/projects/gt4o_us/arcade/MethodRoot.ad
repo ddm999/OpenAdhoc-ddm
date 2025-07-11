@@ -439,6 +439,8 @@ module ArcadeProject::MakerRoot
 
     function onInitialize(context)
     {
+        context.cursor_visible = true;
+
         hidden.visible = false;
         ToolTip::tip.remove();
         ROOT::current_method = "ByMaker" // Original code weirdness, don't really need to access by root when it's already in scope here

@@ -74,6 +74,8 @@ module ArcadeProject::CarRoot
 
     function onInitialize(context)
     {
+        context.cursor_visible = true;
+
         hidden.visible = false;
         ToolTip::tip.remove();
         ToolTip2::tip.remove();
