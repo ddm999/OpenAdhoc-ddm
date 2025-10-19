@@ -1,0 +1,106 @@
+module DebugEnemySelectionRoot
+{
+    hidden.visible = false;
+    static sCarId = 0;
+
+    method onInitialize(context)
+    { try {
+        MovieFace.play_movie(context);
+
+        CarList.setItemTemplate(context, hidden::CarItem);
+        updateCarList(context);
+
+        DebugEnemySelectionRoot.setFocus(DebugEnemySelectionRoot);
+    } catch (e) { pdistd::AppendFile("/APP_DATA_RAW/error.txt", "%{e}\n"); }}
+
+    method onFinalize(context)
+    {
+        MovieFace.stop_movie(context);
+        return 2;
+    }
+
+    method onCancel(context)
+    {
+        sound.playSingle("gtc_exit");
+        SequenceUtil::startPage(context, LevelSelectRoot);
+        return 2;
+    }
+
+    method onKeyPress(context, event)
+    {
+        if (event.keysym == CELL_PAD_CTRL_L3_UP) {
+            // invert track dirt setting
+            gRaceSetup["is_dirt"] = !gRaceSetup["is_dirt"];
+            updateCarList(context);
+            return 2;
+        } else if (event.keysym == CELL_PAD_CTRL_L3_LEFT) {
+            // switch car previous
+            sCarId -= 1;
+            if (sCarId < 0)
+                sCarId = gCarData.size-1;
+            gRaceSetup["car"] = gCarData[sCarId];
+            updateCarList(context);
+            return 2;
+        } else if (event.keysym == CELL_PAD_CTRL_L3_RIGHT) {
+            // switch car next
+            sCarId += 1;
+            if (sCarId >= gCarData.size)
+                sCarId = 0;
+            gRaceSetup["car"] = gCarData[sCarId];
+            updateCarList(context);
+            return 2;
+        } else if (event.keysym == CELL_PAD_CTRL_L3_DOWN) {
+            // reload with no change
+            updateCarList(context);
+            return 2;
+        }
+        return 0;
+    }
+
+    method updateCarList(context)
+    { try {
+        var opponent_count = gRaceSetup["opponents"];
+        if (gRaceSetup["is_dirt"])
+            opponent_count = gRaceSetup["dirt_opponents"];
+
+        CarList.setItemCount(opponent_count + 1);
+
+        if (!gRaceSetup["preset_ai"])
+        {
+            GTConceptProject.generateEnemyCarList();
+        }
+
+        for (var i = 0; i < opponent_count; i++)
+        {
+            var w = CarList.getItemWidget(i, context);
+            w.TextFace.text = gRaceSetup["ai"][i];
+            w.Position.text = i+1;
+            w.PlayerMark.visible = false;
+            w.RivalMark.visible = false;
+            if (gRaceSetup["rival"] && i == opponent_count-1)
+            {
+                w.RivalMark.visible = true;
+            }
+        }
+
+        var w = CarList.getItemWidget(opponent_count, context);
+        w.TextFace.text = gRaceSetup["car"][0];
+        w.Position.text = opponent_count+1;
+        w.PlayerMark.visible = true;
+        w.RivalMark.visible = false;
+    } catch (e) { pdistd::AppendFile("/APP_DATA_RAW/error.txt", "%{e}\n"); }}
+
+    module MovieFace
+    {
+        method play_movie(context)
+        {
+            var movie_file = "/movies/gtc/category_gtc";
+            self.load(context, movie_file);
+        }
+        method stop_movie(context)
+        {
+            self.pause(true);
+            self.unload();
+        }
+    }
+}

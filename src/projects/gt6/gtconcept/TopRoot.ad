@@ -1,0 +1,203 @@
+module TopRoot
+{
+    hidden.visible = false;
+    static sCredits = "GT Concept 2022 Recreation by ddm\n\nGT6 modding toolchain by Nenkai\nGT6 script reversing by Nenkai\nModding support from\nNenkai, TheAdmiester, Xenn\n\nGT Modding Community Discord:\nhttps://discord.io/gtonline";
+
+    static sMenuList = [
+        "", // hacky way to keep it centered
+        "Game Start",
+        "File Management",
+        "Options",
+        "Credits",
+        "", // hacky way to keep it centered
+    ];
+    static sEditedMenuList = false;
+    static sFocusJump = false;
+
+    method onInitialize(context)
+    { try {
+        if (SoundUtil::BGMIsPlaying())
+        {
+            SoundUtil::BGMFadeout(1f);
+        }
+
+        MovieFace.play_movie(context);
+
+        if (sEditedMenuList == false)
+        {
+            if (isDemo(context) == true)
+            {
+                sMenuList = ["", "Game Start", "File Management", "Credits", ""];
+            }
+            if (isDevelop(context) == true)
+            {
+                sMenuList.pop();
+                sMenuList.append(["Toggle Debug", "Design Work", ""]);
+            }
+            sEditedMenuList = true;
+        }
+
+        Menu.setItemTemplate(context, hidden::MenuItem);
+        Menu.setItemCount(sMenuList.size);
+
+        for (var i = 0; i < sMenuList.size; i++)
+        {
+            var w = Menu.getItemWidget(i, context);
+            w.TextFace.text = sMenuList[i];
+        }
+
+        var w = Menu.getItemWidget(0);
+        w.TextFace.text_color = hidden::SelectedMenuItemText.text_color;
+        w.TextFace.scale_x = hidden::SelectedMenuItemText.scale_x;
+        w.TextFace.scale_y = hidden::SelectedMenuItemText.scale_y;
+
+        if (gDebugEnabled) {
+            TopRoot::DebugText.visible = 1;
+        } else {
+            TopRoot::DebugText.visible = 0;
+        }
+
+        Menu.focus_index = 1;
+        sFocusJump = false;
+        TopRoot.setFocus(Menu);
+
+        if (isDevelop(context) == true)
+            Menu.focus_index = sMenuList.size - 2;
+
+        VersionText.text = getVersionText(context);
+    } catch (e) { pdistd::AppendFile("/APP_DATA_RAW/error.txt", "%{e}\n"); }}
+
+    method onKeyPress(context, event)
+    {
+        if (gDebugEnabled && event.keysym == CELL_PAD_CTRL_TRIANGLE)
+        {
+            adhocCrashToForceReloadProject();
+            return 2;
+        }
+        return 0;
+    }
+
+    method onFinalize(context)
+    {
+        MovieFace.stop_movie(context);
+        return 2;
+    }
+
+    method onCancel(context)
+    {
+        sound.playSingle("gtc_exit");
+        SequenceUtil::startProject(context, "gtconcept");
+        return 2;
+    }
+
+    module Menu
+    {
+        attribute activated_item;
+
+        method onFocusNotify(context, new_index, old_index)
+        {
+            // hacky way to keep it centered
+            // fake blank first and last items 
+            if (new_index == 0)
+            {
+                sFocusJump = true;
+                new_index = sMenuList.size - 2;
+                Menu.focus_index = new_index;
+            }
+            else if (new_index == sMenuList.size - 1)
+            {
+                sFocusJump = true;
+                new_index = 1;
+                Menu.focus_index = new_index;
+            }
+            else
+            {
+                if (sFocusJump == true)
+                    sFocusJump = false;
+                if (old_index != -1)
+                    sound.playSingle("gtc_move");
+            }
+
+            if (old_index != -1)
+            {
+                var w = Menu.getItemWidget(old_index);
+                w.TextFace.text_color = hidden::MenuItem::TextFace.text_color;
+                w.TextFace.scale_x = hidden::MenuItem::TextFace.scale_x;
+                w.TextFace.scale_y = hidden::MenuItem::TextFace.scale_y;
+            }
+            if (new_index != -1)
+            {
+                var w = self.getItemWidget(new_index);
+                w.TextFace.text_color = hidden::SelectedMenuItemText.text_color;
+                w.TextFace.scale_x = hidden::SelectedMenuItemText.scale_x;
+                w.TextFace.scale_y = hidden::SelectedMenuItemText.scale_y;
+            }
+            return 2;
+        }
+
+        method onActivate(context)
+        {
+            context.disableInput();
+            sound.playSingle("gtc_select");
+            var w = self.getItemWidget(self.focus_index);
+            self.activated_item = w;
+
+            w.Flash.restart();
+            w.Flash.on_effect_end = self.flashEnd;
+
+            return 2;
+        }
+
+        method flashEnd(context)
+        {
+            var w = self.getItemWidget(self.focus_index);
+            w.Flash.on_effect_end = nil;
+            context.enableInput();
+
+            var w = self.activated_item;
+
+            switch (w.TextFace.text)
+            {
+                case "Game Start":
+                    SequenceUtil::startPage(context, MainMenuRoot);
+                    break;
+                case "File Management":
+                    DialogUtil::openConfirmDialog(context, DialogUtil::ERROR, "TODO");
+                    //SequenceUtil::startPage(context, FileManagementRoot);
+                    break;
+                case "Options":
+                    DialogUtil::openConfirmDialog(context, DialogUtil::ERROR, "TODO");
+                    //SequenceUtil::startPage(context, OptionsRoot);
+                    break;
+                case "Credits":
+                    DialogUtil::openConfirmDialog(context, DialogUtil::OK, sCredits);
+                    break;
+                case "Toggle Debug":
+                    GTConceptProject.toggleDebug();
+                    if (gDebugEnabled) {
+                        TopRoot::DebugText.visible = 1;
+                    } else {
+                        TopRoot::DebugText.visible = 0;
+                    }
+                    break;
+                case "Design Work":
+                    SequenceUtil::startPage(context, DesignWorkRoot_Page1);
+                    break;
+            }
+        }
+    }
+
+    module MovieFace
+    {
+        method play_movie(context)
+        {
+            var movie_file = "/movies/gtc/arcade_menu_gtc";
+            self.load(context, movie_file);
+        }
+        method stop_movie(context)
+        {
+            self.pause(true);
+            self.unload();
+        }
+    }
+}

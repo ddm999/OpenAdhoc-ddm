@@ -1,0 +1,404 @@
+module GameStatusRoot
+{
+    static sCursorSelection = 0;
+
+    static sUnlockCount = 0;
+    static sUnlockData = [
+        "midfield": 0, "r_midfield": 0,
+        "akasaka": 0, "r_akasaka": 0,
+        "toscana": 0, "r_toscana": 0,
+        "eiger_dirt_east": 0, "r_eiger_dirt_east": 0,
+        "autumn": 0, "r_autumn": 0
+    ];
+
+    // cursor map data:
+    //  start: up, left, right, down, object, car label
+    static sCursorMap = [
+        // r_akasaka
+         0: [ 8, 0, 1, 2,window::clip::space::r_akasaka::cars::pro,"crossfire_04"],
+         1: [ 0, 0, 3, 2,window::clip::space::r_akasaka::cars::normal,"rs6_02"],
+         2: [ 1, 0, 3,24,window::clip::space::r_akasaka::cars::license_gold,"_350z_lm_us_02"],
+         3: [ 1, 2, 6,24,window::clip::space::r_akasaka::cars::license_bronze,"au_supra_01"],
+
+        // akasaka
+         4: [ 8, 1, 6, 5,window::clip::space::akasaka::cars::pro,"nsx_r_proto_lm_01"],
+         5: [ 4, 4, 7, 6,window::clip::space::akasaka::cars::normal,"nsx_r_01"],
+         6: [ 5, 3, 7,28,window::clip::space::akasaka::cars::license_gold,"mazda6_tmv_n1_01"],
+         7: [ 5, 6,11,28,window::clip::space::akasaka::cars::license_bronze,"hcd6_concept_01"],
+
+        // midfield
+         8: [12, 4, 9,10,window::clip::space::midfield::cars::pro,"c8_laviolette_02"],
+         9: [ 8, 8,11,10,window::clip::space::midfield::cars::normal,"mini_cooper_s_02"],
+        10: [ 9, 5,11, 7,window::clip::space::midfield::cars::license_gold,"nsx_r_proto_lm_road_01"],
+        11: [ 9,10,14,40,window::clip::space::midfield::cars::license_bronze,"pennzoil_gtr_01"],
+
+        // r_midfield
+        12: [12,13,16,15,window::clip::space::r_midfield::cars::pro,"gtr_concept_tmv_01"],
+        13: [12,14,12,15,window::clip::space::r_midfield::cars::normal,"castrol_supra_01"],
+        14: [13,11,15,40,window::clip::space::r_midfield::cars::license_bronze,"rsc_tmv_01"],
+        15: [13,14,17,18,window::clip::space::r_midfield::cars::license_gold,"mm_r_tmv_01"],
+
+        // autumn
+        16: [12,17,21,19,window::clip::space::autumn::cars::pro,"cz3_tar_wrc_01"],
+        17: [16,18,16,19,window::clip::space::autumn::cars::normal,"dualnote_tmv_01"],
+        18: [14,14,19,33,window::clip::space::autumn::cars::license_bronze,"cien_dmv_02"],
+        19: [17,18,22,33,window::clip::space::autumn::cars::license_gold,"gtr_concept_lm_01"],
+
+        // r_autumn
+        20: [12,21,20,23,window::clip::space::r_autumn::cars::pro,"w12_tmv_01"],
+        21: [20,22,20,23,window::clip::space::r_autumn::cars::normal,"clix_concept_01"],
+        22: [21,19,23,37,window::clip::space::r_autumn::cars::license_bronze,"r34_gtr_v_gtcolor_01"],
+        23: [21,22,20,37,window::clip::space::r_autumn::cars::license_gold,"ford_gt_concept_gulf_02"],
+
+        // r_toscana
+        24: [ 3,27,25,26,window::clip::space::r_toscana::cars::license_gold,"rsc_tmv_lm_01"],
+        25: [ 3,24,28,26,window::clip::space::r_toscana::cars::license_bronze,"copen_detachabletop_02"],
+        26: [24,27,25,27,window::clip::space::r_toscana::cars::normal,"mazda6_tmv_01"],
+        27: [24, 0,26,27,window::clip::space::r_toscana::cars::pro,"zonda_c12s_gmv_02"],
+
+        // toscana
+        28: [ 7,25,29,30,window::clip::space::toscana::cars::license_gold,"xkr_rperform_02"],
+        29: [ 7,28,40,30,window::clip::space::toscana::cars::license_bronze,"infiniti_fx45_dmv_02"],
+        30: [28,31,29,31,window::clip::space::toscana::cars::normal,"mobil_nsx_01"],
+        31: [28,26,30,31,window::clip::space::toscana::cars::pro,"ford_gt_concept_dmv_02"],
+
+        // eiger_dirt_east
+        32: [18,40,33,34,window::clip::space::eiger_dirt_east::cars::license_bronze,"elise_type72_01"],
+        33: [18,32,36,34,window::clip::space::eiger_dirt_east::cars::license_gold,"integra_r_lm_01"],
+        34: [33,32,35,35,window::clip::space::eiger_dirt_east::cars::normal,"focus_rs_02"],
+        35: [33,34,38,31,window::clip::space::eiger_dirt_east::cars::pro,"solstice_dmv_02"],
+
+        // r_eiger_dirt_east
+        36: [22,33,37,38,window::clip::space::r_eiger_dirt_east::cars::license_bronze,"tt_dtm_02"],
+        37: [22,36,39,38,window::clip::space::r_eiger_dirt_east::cars::license_gold,"rx8_lm_01"],
+        38: [37,36,39,39,window::clip::space::r_eiger_dirt_east::cars::normal,"fairlady_z_aero_02"],
+        39: [37,38,20,31,window::clip::space::r_eiger_dirt_east::cars::pro,"gsx_r_4_tmv_01"],
+
+        // back
+        40: [14,29,32,43,window::clip::space::center::buttons::back,nil],
+
+        // bonus
+        41: [40,30,42,31,window::clip::space::center::bonuses::jp_intro,nil],
+        42: [40,41,43,31,window::clip::space::center::bonuses::credits,nil],
+        43: [40,42,44,31,window::clip::space::center::bonuses::gt3_save_data,nil],
+        44: [40,43,34,35,window::clip::space::center::bonuses::pod_race,nil]
+    ];
+
+    method open(context)
+    {
+        GTConceptProject.history[$"ReturnPage"] = nil;
+        SequenceUtil::startPageSimple(context, self);
+    }
+
+    method setupCarThumbnails(context)
+    {
+        foreach (var [key, item] in sCursorMap)
+        {
+            if (item[5] != nil)
+            {
+                var label = item[5];
+                var it = SPECDB.query1("SELECT MainColor FROM CAR_VIEW WHERE Label=?", [label]);
+                item[4].image_path = "car/thumbnail_L/%s_%02d".format(label, it.MainColor);
+            }
+        }
+    }
+
+    function valueToTrophy(context, value, obj)
+    {
+        switch (value)
+        {
+            case 1L:
+                obj.image_path = "piece/gtc/trophy_gold.img";
+                obj.visible = true;
+                break;
+            case 2L:
+                obj.image_path = "piece/gtc/trophy_silver.img";
+                obj.visible = true;
+                break;
+            case 3L:
+                obj.image_path = "piece/gtc/trophy_bronze.img";
+                obj.visible = true;
+                break;
+            default:
+                obj.visible = false;
+                break;
+        }
+    }
+
+    function trackLocks(context, trackobj, trackname, enabled_color, disabled_color)
+    {
+        var ach_license_bronze = gLicenseTrophies[trackname] > 0L && gLicenseTrophies[trackname] <= 3L;
+        var ach_license_gold = gLicenseTrophies[trackname] == 1L;
+        var ach_normal = gNormalRaceTrophies[trackname] == 1L;
+        var ach_pro = gProRaceTrophies[trackname] == 1L;
+
+        valueToTrophy(context, gLicenseTrophies[trackname], trackobj["trophies"]["license"]);
+        valueToTrophy(context, gNormalRaceTrophies[trackname], trackobj["trophies"]["normal"]);
+        valueToTrophy(context, gProRaceTrophies[trackname], trackobj["trophies"]["pro"]);
+
+        trackobj["cars"]["license_bronze"].setColor(ach_license_bronze ? enabled_color : disabled_color);
+        trackobj["cars"]["license_gold"].setColor(ach_license_gold ? enabled_color : disabled_color);
+        trackobj["cars"]["normal"].setColor(ach_normal ? enabled_color : disabled_color);
+        trackobj["cars"]["pro"].setColor(ach_pro ? enabled_color : disabled_color);
+
+        sUnlockData[trackname] = (ach_license_bronze ? 1 : 0) + (ach_license_gold ? 2 : 0) + (ach_normal ? 4 : 0) + (ach_pro ? 8 : 0);
+
+        return ((ach_license_bronze ? 1 : 0) + (ach_license_gold ? 1 : 0) + (ach_normal ? 1 : 0) + (ach_pro ? 1 : 0));
+    }
+
+    method setupLocks(context)
+    {
+        var enabled = main::menu::MColorObject(1.0f, 1.0f, 1.0f);
+        var disabled = main::menu::MColorObject(0.0f, 0.0f, 0.0f);
+
+        sUnlockCount = 0;
+        sUnlockCount += trackLocks(context, window::clip::space::midfield, "midfield", enabled, disabled);
+        sUnlockCount += trackLocks(context, window::clip::space::r_midfield, "r_midfield", enabled, disabled);
+        sUnlockCount += trackLocks(context, window::clip::space::akasaka, "akasaka", enabled, disabled);
+        sUnlockCount += trackLocks(context, window::clip::space::r_akasaka, "r_akasaka", enabled, disabled);
+        sUnlockCount += trackLocks(context, window::clip::space::toscana, "toscana", enabled, disabled);
+        sUnlockCount += trackLocks(context, window::clip::space::r_toscana, "r_toscana", enabled, disabled);
+        sUnlockCount += trackLocks(context, window::clip::space::eiger_dirt_east, "eiger_dirt_east", enabled, disabled);
+        sUnlockCount += trackLocks(context, window::clip::space::r_eiger_dirt_east, "r_eiger_dirt_east", enabled, disabled);
+        sUnlockCount += trackLocks(context, window::clip::space::autumn, "autumn", enabled, disabled);
+        sUnlockCount += trackLocks(context, window::clip::space::r_autumn, "r_autumn", enabled, disabled);
+
+        window::clip::space::center::bonuses::jp_intro.setColor(sUnlockCount >= 10 ? enabled : disabled);
+        window::clip::space::center::bonuses::credits.setColor(sUnlockCount >= 20 ? enabled : disabled);
+        window::clip::space::center::bonuses::gt3_save_data.setColor(sUnlockCount >= 30 ? enabled : disabled);
+        window::clip::space::center::bonuses::pod_race.setColor(sUnlockCount >= 40 ? enabled : disabled);
+
+        window::clip::space::center::achieved_percentage.text = "%{(sUnlockCount*2.5f).toInt()}%";
+    }
+
+    method onInitialize(context)
+    {
+        var obj = sCursorMap[40][4];
+        GameStatusRoot.setFocus(obj);
+        sCursorSelection = 40;
+
+        foreach (var prizeEvent in gPrizeEventStack)
+        {
+            showReward(context, prizeEvent);
+            DialogUtil::openConfirmDialog(context, DialogUtil::OK, "your winner!\n\n%{prizeEvent}");
+        }
+
+        if (((sUnlockCount - gPrizeEventStack.size) < 10) && (sUnlockCount >= 10)) {
+            DialogUtil::openConfirmDialog(context, DialogUtil::OK, "unlocked bonus!\n\njp_intro");
+        } else if (((sUnlockCount - gPrizeEventStack.size) < 20) && (sUnlockCount >= 20)) {
+            DialogUtil::openConfirmDialog(context, DialogUtil::OK, "unlocked bonus!\n\ncredits");
+        } else if (((sUnlockCount - gPrizeEventStack.size) < 30) && (sUnlockCount >= 30)) {
+            DialogUtil::openConfirmDialog(context, DialogUtil::OK, "unlocked bonus!\n\ngt3_save_data");
+        } else if (((sUnlockCount - gPrizeEventStack.size) < 40) && (sUnlockCount >= 40)) {
+            DialogUtil::openConfirmDialog(context, DialogUtil::OK, "unlocked bonus!\n\npod_race");
+        }
+        gPrizeEventStack = [];
+
+        setupCarThumbnails(context);
+        setupLocks(context);
+
+        DebugText.visible = gDebugEnabled;
+    }
+
+    method moveCursor(context, dir)
+    {
+        sCursorSelection = sCursorMap[sCursorSelection][dir];
+        sound.playSingle("gtc_move");
+
+        var obj = sCursorMap[sCursorSelection][4];
+        GameStatusRoot.setFocus(obj);
+    }
+
+    method onKeyPress(context, event)
+    {
+        if (event.keysym == CELL_PAD_CTRL_L3_UP) {
+            moveCursor(context, 0);
+            return 2;
+        } else if (event.keysym == CELL_PAD_CTRL_L3_LEFT) {
+            moveCursor(context, 1);
+            return 2;
+        } else if (event.keysym == CELL_PAD_CTRL_L3_RIGHT) {
+            moveCursor(context, 2);
+            return 2;
+        } else if (event.keysym == CELL_PAD_CTRL_L3_DOWN) {
+            moveCursor(context, 3);
+            return 2;
+        }
+        return 0;
+    }
+
+    method onActivate(context)
+    {
+        if (sCursorSelection == -1)
+        {
+            // exiting new car screen
+            SceneFace.cleanup();
+            reward.visible = false;
+            SoundUtil::MenuBGMCrossfadeGroup("gtc_mmenu", 0f, 0f, SoundUtil::REPEAT_TRACK);
+            return 2;
+        }
+
+        if (sCursorSelection < 40)
+            return 0;
+
+        if (sCursorSelection == 40)
+        {
+            onCancel(context);
+            return 2;
+        }
+
+        if (sCursorSelection == 41)
+        {
+            // jp_intro
+            if (sUnlockCount >= 10) {
+                DialogUtil::openConfirmDialog(context, DialogUtil::ERROR, "TODO\njp_intro");
+            } else {
+                sound.playSingle("gtc_no");
+            }
+            return 2;
+        }
+
+        if (sCursorSelection == 42)
+        {
+            // credits
+            if (sUnlockCount >= 20) {
+                DialogUtil::openConfirmDialog(context, DialogUtil::ERROR, "TODO\ncredits");
+            } else {
+                sound.playSingle("gtc_no");
+            }
+            return 2;
+        }
+
+        if (sCursorSelection == 43)
+        {
+            // gt3_save_data
+            if (sUnlockCount >= 30) {
+                DialogUtil::openConfirmDialog(context, DialogUtil::ERROR, "TODO\ngt3_save_data");
+            } else {
+                sound.playSingle("gtc_no");
+            }
+            return 2;
+        }
+
+        if (sCursorSelection == 44)
+        {
+            // pod_race
+            if (sUnlockCount >= 40) {
+                DialogUtil::openConfirmDialog(context, DialogUtil::ERROR, "TODO\npod_race");
+            } else {
+                sound.playSingle("gtc_no");
+            }
+            return 2;
+        }
+    }
+
+    method onCancel(context)
+    {
+        // don't really wanna replicate the weird GTC behaviour of doing the same thing with a different noise,
+        //  so we just pretend it's an activate input
+        if (sCursorSelection == -1)
+            onActivate(context);
+
+        sound.playSingle("gtc_exit");
+        SequenceUtil::startPage(context, MainMenuRoot);
+        return 2;
+    }
+
+    method showReward(context, prize_event)
+    {
+        sCursorSelection = -1;
+        reward.visible = true;
+        SoundUtil::MenuBGMCrossfadeGroup("gtc_newcar", 0f, 0f, SoundUtil::REPEAT_OFF, true);
+
+
+        var cp = gtengine::MCarParameter(carcode);
+        SceneFace.setCar(cp);
+        SceneFace.setCourse(course);
+        SceneFace.loadCar();
+    }
+
+    module SceneFace
+    {
+        static sRotationSpeed = 0.4f;
+        static sAnimSpeed = 0.01f;
+
+        attribute anim_percent;
+        attribute cp;
+        attribute thread;
+        attribute car_r;
+
+        method cleanup()
+        {
+            if (self.thread != nil)
+            {
+                self.thread.terminate();
+                self.thread = nil;
+            }
+        }
+
+        method setCar(cp)
+        {
+            self.cp = cp;
+        }
+
+        method setCourse(name)
+        {
+            self.setImagePath("piece/gtc/CourseLicenseRoot_bakedbg_%{name}.img");
+        }
+
+        method clearCar()
+        {
+            self.cleanup();
+            self.execCommandImmidiate("clearEntity car0");
+            self.scene_fade = 0f;
+            SceneFace.visible = false;
+        }
+
+        method loadCar()
+        {
+            if (self.cp == nil)
+                return;
+
+            self.scene_fade = 0f;
+            self.car_r = -160f;
+            self.anim_percent = 0f;
+            var cubic_motion = 0f;
+
+            self.resetCommandQueue();
+            self.setDefaultCarParameter(self.cp, 0);
+            self.execCommand("resetGlobalMotionFrame");
+            self.execCommand("setCameraPosition 0 1 0.5");
+            self.execCommand("setCameraLookAt 0 0 -10");
+            self.execCommand("setCameraFovY 25");
+            self.execCommand("changeCar _default car0");
+            self.execCommand("setModelTranslation 1.5 0 4 car0");
+            self.execCommand("setModelRotation 0 0 0 car0");
+
+            self.thread = Thread(function()
+            {
+                // too lazy to figure out why isUnderSetup() check isn't working
+                Thread::Sleep(0.3);
+
+                SceneFace.visible = true;
+
+                for (;;)
+                {
+                    if (self.anim_percent < 1f)
+                    {
+                        self.anim_percent += self.sAnimSpeed;
+                        self.scene_fade = self.anim_percent;
+                        cubic_motion = 1 - ((1 - self.anim_percent)**3);
+                        self.execCommand("setModelTranslation %{1.5f-(cubic_motion*1.5f)} 0 %{4f-(cubic_motion*14)} car0");
+                    }
+
+                    self.car_r += self.sRotationSpeed;
+                    if (self.car_r > 360f) { self.car_r -= 360f; }
+                    self.execCommand("setModelRotation 0 %{self.car_r} 0 car0");
+                    Thread::Sleep(0.005);
+                }
+            });
+
+            self.thread.start();
+        }
+    }
+}

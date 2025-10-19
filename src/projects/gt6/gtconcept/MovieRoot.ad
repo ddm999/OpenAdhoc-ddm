@@ -1,0 +1,94 @@
+module IntroRoot
+{
+    method onInitialize(context)
+    {
+        IntroRoot.setFocus(IntroRoot);
+    }
+
+    method onFinalize(context)
+    {
+
+    }
+
+    method onCancel(context)
+    {
+        sound.playSingle("gtc_cancel");
+        SequenceUtil::startProject(context, "gtmode");
+        return 2;
+    }
+}
+
+/*
+    static sMovieId = 0;
+    static sMovieList = [
+        "movies/gtc/arcade_menu_gtc",
+        "movies/gtc/category_gtc",
+        "movies/gtc/ending_GTC",
+        "movies/gtc/ending_long_full",
+        "movies/gtc/level_gtc",
+        "movies/gtc/opening",
+        "movies/gtc/opening_GTCJP",
+        "movies/gtc/tvcm_GTCJP1",
+        "movies/gtc/tvcm_GTCJP2"
+    ];
+
+    method onInitialize(context)
+    {
+        DesignWorkRoot_Page2.setFocus(DesignWorkRoot_Page2);
+        MovieFace.play_movie(context);
+    }
+    method onFinalize(context)
+    {
+        MovieFace.stop_movie(context);
+        return 2;
+    }
+    method onKeyPress(context, event)
+    {
+        if (event.keysym == CELL_PAD_CTRL_CROSS) {
+            MovieFace.end_movie(context);
+            SequenceUtil::startPage(context, DesignWorkRoot_Page3);
+        } else if (event.keysym == CELL_PAD_CTRL_TRIANGLE) {
+            MovieFace.end_movie(context);
+            SequenceUtil::startPage(context, DesignWorkRoot_Page1);
+        } else if (event.keysym == CELL_PAD_CTRL_L3_RIGHT) {
+            MovieFace.end_movie(context);
+            MovieFace.stop_movie(context);
+            sMovieId = (sMovieId + 1) % sMovieList.size;
+            MovieFace.play_movie(context);
+        } else if (event.keysym == CELL_PAD_CTRL_L3_LEFT) {
+            MovieFace.end_movie(context);
+            MovieFace.stop_movie(context);
+            sMovieId = (sMovieId - 1) % sMovieList.size;
+            MovieFace.play_movie(context);
+        }
+    }
+    method onCancel(context)
+    {
+        sound.playSingle("gtc_cancel");
+        MovieFace.end_movie(context);
+        SequenceUtil::startPage(context, TopRoot);
+        return 2;
+    }
+
+    module MovieFace
+    {
+        method play_movie(context)
+        {
+            self.audio_level = SoundUtil::GetMovieVolume();
+            self.audio_track = -1;
+
+            var movie_file = sMovieList[sMovieId];
+            self.load(context, movie_file);
+        }
+        method stop_movie(context)
+        {
+            self.unload();
+        }
+        method end_movie(context)
+        {
+            self.pause(true);
+            context.wait();
+            context.wait();
+        }
+    }
+*/

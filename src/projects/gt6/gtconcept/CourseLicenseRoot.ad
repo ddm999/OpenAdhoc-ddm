@@ -1,0 +1,422 @@
+module CourseLicenseRoot
+{
+    hidden.visible = false;
+
+    static gp;
+    static sEvents = [];
+    static sCarNames = [
+        // 2002 Tokyo-Geneva
+        "sl500_02": "SL500",                                    // midfield fwd
+        "ford_gt_concept_gulf_02": "GT40 LM",                   // tokyo fwd
+        "rsc_tmv_lm_01": "TOYOTA RSC Rally Car",                // toscana fwd
+        "accent_wrc_01": "Accent Rally Car",                    // eiger fwd
+        "elise2000_00": "Elise",                                // autumn fwd
+        "tt_dtm_02": "Abt Audi TT-R",                           // midfield rev
+        "nsx_r_01": "HONDA NSX-R Prototype",                    // tokyo rev
+        "focus_rs_02": "Focus RS",                              // toscana rev
+        "cz3_tar_wrc_01": "MITSUBISHI CZ3 Tarmac Rally Car",    // eiger rev
+        "gtr_concept_tmv_01": "NISSAN GT-R Concept",            // autumn rev
+    ];
+
+    static sCourseNames = [
+        "midfield": "Mid-Field Raceway",
+        "akasaka": "Tokyo R246",
+        "toscana": "Toscana",
+        "eiger_dirt_east": "Eiger Nordwand Trail",
+        "autumn": "Autumn Ring",
+        "r_midfield": "Mid-Field Raceway II",
+        "r_akasaka": "Tokyo R246 II",
+        "r_toscana": "Toscana II",
+        "r_eiger_dirt_east": "Eiger Nordwand Trail II",
+        "r_autumn": "Autumn Ring II"
+    ];
+
+    method open(context)
+    {
+        GTConceptProject.history[$"ReturnPage"] = nil;
+        SequenceUtil::startPageSimple(context, self);
+    }
+
+    method onInitialize(context)
+    {
+        gp = GameParameterUtil::createFromFile("game_parameter/gt6/event/r2200.xml");
+        sEvents = [];
+        for (var i=0; i<gp.events.size; i++)
+        {
+            sEvents.append([
+                $"COURSE": gtengine::MSpecDB::getCourseLabel(gp.events[i].track.course_code),
+                $"TIMEGOLD": gp.events[i].eval_condition.gold,
+                $"TIMESILVER": gp.events[i].eval_condition.silver,
+                $"TIMEBRONZE": gp.events[i].eval_condition.bronze,
+                $"CAR": gp.events[i].entry_set.entries[0].car.getCarCode(),
+                $"DESC": gp.events[i].information.description.getText()
+            ]);
+        }
+
+        Menu.setItemTemplate(context, hidden::MenuItem);
+        Menu.setItemCount(sEvents.size);
+
+        for (var i = 0; i < sEvents.size; i++)
+        {
+            var w = Menu.getItemWidget(i, context);
+
+            var shortname = sEvents[i][$"COURSE"];
+            if (shortname.beginsWith("r_"))
+            {
+                w.Forward.visible = false;
+                w.Highlight.visible = false;
+                w.Reverse.visible = true;
+                w.ReverseHighlight.visible = true;
+                shortname = shortname.substr(2, shortname.length);
+            }
+
+            if (shortname.beginsWith("eiger"))
+                shortname = "eiger";
+
+            w.CourseIcon.image_path = "piece/gtc/CourseIcon_%{shortname}.img";
+
+            switch (gLicenseTrophies[sEvents[i][$"COURSE"]])
+            {
+                case 0:
+                    w.Trophy.visible = 0;
+                    break;
+                case 1:
+                    w.Trophy.image_path = "piece/gtc/trophy_gold.img";
+                    w.Trophy.visible = 1;
+                    break;
+                case 2:
+                    w.Trophy.image_path = "piece/gtc/trophy_silver.img";
+                    w.Trophy.visible = 1;
+                    break;
+                case 3:
+                    w.Trophy.image_path = "piece/gtc/trophy_bronze.img";
+                    w.Trophy.visible = 1;
+                    break;
+            }
+
+            /*
+            w.Debug.visible = gDebugEnabled;
+            if (gDebugEnabled)
+            {
+                w.CourseIcon.opacity = 0.25f;
+                w.Debug.TextFace.text = shortname;
+            }
+            */
+        }
+
+        CourseLicenseRoot.setFocus(Menu);
+
+        if (GTConceptProject.history[$"ReturnPageArg"] != nil)
+        {
+            Menu.focus_index = GTConceptProject.history[$"ReturnPageArg"];
+            GTConceptProject.history[$"ReturnPageArg"] = nil;
+        }
+    }
+
+    method onCancel(context)
+    {
+        sound.playSingle("gtc_exit");
+        SceneFace.cleanup();
+        SequenceUtil::startPage(context, MainMenuRoot);
+        return 2;
+    }
+
+    method launchCourseLicense(context, id, pace_car)
+    {
+        SceneFace.cleanup();
+
+        GTConceptProject.history[$"ReturnPage"] = CourseLicenseRoot.name;
+        GTConceptProject.history[$"ReturnPageArg"] = id;
+
+        gp.event_index = id;
+        GameParameterUtil::executeEvent(context, gp, GAME_STATUS);
+    }
+
+    module Menu
+    {
+        attribute shortname;
+
+        method timeToText(time)
+        {
+            //9'59.999
+            var m = time / 60000;
+            var s = (time / 1000) % 60;
+            var ms = time % 1000;
+
+            return "%d'%02d.%03d".format(m, s, ms);
+        }
+
+        method changeSelection(context, id, moving_left)
+        {
+            self.shortname = sEvents[id][$"COURSE"];
+            if (self.shortname.beginsWith("r_"))
+            {
+                self.shortname = self.shortname.substr(2, self.shortname.length);
+            }
+
+            if (self.shortname.beginsWith("eiger"))
+                self.shortname = "eiger";
+
+            CourseLicenseRoot::MarqueeBar::clipper::tip.text = "Tips: %{sEvents[id][$"DESC"]}";
+            CourseLicenseRoot::MarqueeBar::clipper::tip.TranslateX.reset();
+            CourseLicenseRoot::MarqueeBar::clipper::tip.TranslateX.start();
+            CourseLicenseRoot::MarqueeBar::clipper::tip.FadeIn.reset();
+            CourseLicenseRoot::MarqueeBar::clipper::tip.FadeIn.start();
+
+            CourseLicenseRoot::CourseLogo.FadeIn.reset();
+            CourseLicenseRoot::CourseLogoShadow.FadeIn.reset();
+            CourseLicenseRoot::CourseLogo.FadeOut.reset();
+            CourseLicenseRoot::CourseLogoShadow.FadeOut.reset();
+
+            CourseLicenseRoot::TrackBG.TranslateX.reset();
+
+            CourseLicenseRoot::Arrows::Left.visible = false;
+            CourseLicenseRoot::Arrows::Right.visible = false;
+            if (id >= 3)
+            {
+                CourseLicenseRoot::Arrows::Left.visible = true;
+            }
+            if (id <= 6)
+            {
+                CourseLicenseRoot::Arrows::Right.visible = true;
+            }
+
+            switch (id)
+            {
+                case 0:
+                case 5:
+                    if (moving_left) {
+                        CourseLicenseRoot::TrackBG.TranslateX.start_value = -1920;
+                        CourseLicenseRoot::TrackBG.TranslateX.end_value = 0;
+                    } else {
+                        CourseLicenseRoot::TrackBG.TranslateX.start_value = -7680;
+                        CourseLicenseRoot::TrackBG.TranslateX.end_value = -9600;
+                    }
+                    break;
+                case 1:
+                case 6:
+                    if (moving_left) {
+                        CourseLicenseRoot::TrackBG.TranslateX.start_value = -3840;
+                        CourseLicenseRoot::TrackBG.TranslateX.end_value = -1920;
+                    } else {
+                        CourseLicenseRoot::TrackBG.TranslateX.start_value = 0;
+                        CourseLicenseRoot::TrackBG.TranslateX.end_value = -1920;
+                    }
+                    break;
+                case 2:
+                case 7:
+                    if (moving_left) {
+                        CourseLicenseRoot::TrackBG.TranslateX.start_value = -5760;
+                        CourseLicenseRoot::TrackBG.TranslateX.end_value = -3840;
+                    } else {
+                        CourseLicenseRoot::TrackBG.TranslateX.start_value = -1920;
+                        CourseLicenseRoot::TrackBG.TranslateX.end_value = -3840;
+                    }
+                    break;
+                case 3:
+                case 8:
+                    if (moving_left) {
+                        CourseLicenseRoot::TrackBG.TranslateX.start_value = -7680;
+                        CourseLicenseRoot::TrackBG.TranslateX.end_value = -5760;
+                    } else {
+                        CourseLicenseRoot::TrackBG.TranslateX.start_value = -3840;
+                        CourseLicenseRoot::TrackBG.TranslateX.end_value = -5760;
+                    }
+                    break;
+                case 4:
+                case 9:
+                    if (moving_left) {
+                        CourseLicenseRoot::TrackBG.TranslateX.start_value = -9600;
+                        CourseLicenseRoot::TrackBG.TranslateX.end_value = -7680;
+                    } else {
+                        CourseLicenseRoot::TrackBG.TranslateX.start_value = -5760;
+                        CourseLicenseRoot::TrackBG.TranslateX.end_value = -7680;
+                    }
+                    break;
+            }
+            self.stopSceneFace();
+            CourseLicenseRoot::TrackBG.TranslateX.start();
+            CourseLicenseRoot::TrackBG.TranslateX.on_effect_end = self.startSceneFace;
+
+            CourseLicenseRoot::CourseLogo.FadeOut.start();
+            CourseLicenseRoot::CourseLogoShadow.FadeOut.start();
+
+            CourseLicenseRoot::CourseLogo.FadeOut.on_effect_end = self.switchCourseLogo;
+
+            var label = gtengine::MSpecDB::getCarLabel(sEvents[id][$"CAR"]);
+            CourseLicenseRoot::Car::Name.text = sCarNames[label];
+
+            CourseLicenseRoot::ClearTimes::GoldTime.text = timeToText(sEvents[id][$"TIMEGOLD"]);
+            CourseLicenseRoot::ClearTimes::SilverTime.text = timeToText(sEvents[id][$"TIMESILVER"]);
+            CourseLicenseRoot::ClearTimes::BronzeTime.text = timeToText(sEvents[id][$"TIMEBRONZE"]);
+
+            SceneFace.clearCar();
+        }
+
+        method onFocusNotify(context, new_index, old_index)
+        {
+            if (old_index != -1)
+            {
+                sound.playSingle("gtc_move");
+                var w = self.getItemWidget(old_index);
+                w.Highlight.Opacity.reset();
+                w.ReverseHighlight.Opacity.reset();
+            }
+            if (new_index != -1)
+            {
+                var w = self.getItemWidget(new_index);
+                w.Highlight.Opacity.start();
+                w.ReverseHighlight.Opacity.start();
+
+                changeSelection(context, new_index, new_index < old_index);
+            }
+        }
+
+        method switchCourseLogo(context)
+        {
+            CourseLicenseRoot::CourseLogoShadow.image_path = "piece/gt6/course_logo_L/%{self.shortname}.img";
+            CourseLicenseRoot::CourseLogo.image_path = "piece/gt6/course_logo_L/%{self.shortname}.img";
+
+            CourseLicenseRoot::CourseLogo.FadeIn.start();
+            CourseLicenseRoot::CourseLogoShadow.FadeIn.start();
+        }
+
+        method startSceneFace(context)
+        {
+            show_car(context, sEvents[self.focus_index][$"CAR"], self.shortname);
+        }
+
+        method stopSceneFace(context)
+        {
+            show_car(context, nil, nil);
+        }
+
+        method onActivate(context)
+        {
+            context.disableInput();
+            sound.playSingle("gtc_select");
+            var w = self.getItemWidget(self.focus_index);
+
+            w.Highlight.Opacity.reset();
+            w.ReverseHighlight.Opacity.reset();
+            w.Forward.Flash.restart();
+            w.Reverse.Flash.restart();
+            w.Forward.Flash.on_effect_end = self.flashEnd;
+
+            return 2;
+        }
+
+        method flashEnd(context)
+        {
+            var w = self.getItemWidget(self.focus_index);
+            w.Forward.Flash.on_effect_end = nil;
+            context.enableInput();
+
+            launchCourseLicense(context, self.focus_index, false);
+        }
+    }
+
+    method show_car(context, carcode, course)
+    {
+        SceneFace.clearCar();
+
+        if (carcode == nil)
+        {
+            SceneFace.setCar(nil);
+            return;
+        }
+
+        var cp = gtengine::MCarParameter(carcode);
+        SceneFace.setCar(cp);
+        SceneFace.setCourse(course);
+        SceneFace.loadCar();
+    }
+
+    module SceneFace
+    {
+        static sRotationSpeed = 0.4f;
+        static sAnimSpeed = 0.01f;
+
+        attribute anim_percent;
+        attribute cp;
+        attribute thread;
+        attribute car_r;
+
+        method cleanup()
+        {
+            if (self.thread != nil)
+            {
+                self.thread.terminate();
+                self.thread = nil;
+            }
+        }
+
+        method setCar(cp)
+        {
+            self.cp = cp;
+        }
+
+        method setCourse(name)
+        {
+            self.setImagePath("piece/gtc/CourseLicenseRoot_bakedbg_%{name}.img");
+        }
+
+        method clearCar()
+        {
+            self.cleanup();
+            self.execCommandImmidiate("clearEntity car0");
+            self.scene_fade = 0f;
+            SceneFace.visible = false;
+        }
+
+        method loadCar()
+        {
+            if (self.cp == nil)
+                return;
+
+            self.thread = Thread(function()
+            {
+                // delay load to allow for fast cursor movement
+                Thread::Sleep(0.1);
+                
+                self.scene_fade = 0f;
+                self.car_r = -160f;
+                self.anim_percent = 0f;
+                var cubic_motion = 0f;
+
+                self.resetCommandQueue();
+                self.setDefaultCarParameter(self.cp, 0);
+                self.execCommand("resetGlobalMotionFrame");
+                self.execCommand("setCameraPosition 10 1 10.5");
+                self.execCommand("setCameraLookAt 10 -1.5 0");
+                self.execCommand("setCameraFovY 25");
+                self.execCommand("changeCar _default car0");
+                self.execCommand("setModelTranslation 1.2 -1.5 0 car0");
+                self.execCommand("setModelRotation 0 0 0 car0");
+
+                // too lazy to figure out why isUnderSetup() check isn't working
+                Thread::Sleep(0.3);
+
+                SceneFace.visible = true;
+
+                for (;;)
+                {
+                    if (self.anim_percent < 1f)
+                    {
+                        self.anim_percent += self.sAnimSpeed;
+                        self.scene_fade = self.anim_percent;
+                        cubic_motion = 1 - ((1 - self.anim_percent)**3);
+                        self.execCommand("setModelTranslation %{1.2f+(cubic_motion*10)} -1.5 0 car0");
+                    }
+
+                    self.car_r -= self.sRotationSpeed;
+                    if (self.car_r < 0f) { self.car_r += 360f; }
+                    self.execCommand("setModelRotation 0 %{self.car_r} 0 car0");
+                    Thread::Sleep(0.005);
+                }
+            });
+
+            self.thread.start();
+        }
+    }
+}

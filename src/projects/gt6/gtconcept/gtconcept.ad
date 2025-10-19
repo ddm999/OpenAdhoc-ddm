@@ -1,0 +1,397 @@
+module GTConceptProject
+{
+    GTConceptProject.load("/scripts/gt6/util/gtmode_pack");
+
+    static gMenuSoundHolder = nil;
+
+    static gUIKitProject = nil;
+    static gDebugEnabled = true;
+
+    static gLicenseTrophies = [
+        "midfield": 0L, "r_midfield": 0L,
+        "akasaka": 0L, "r_akasaka": 0L,
+        "toscana": 0L, "r_toscana": 0L,
+        "eiger_dirt_east": 0L, "r_eiger_dirt_east": 0L,
+        "autumn": 0L, "r_autumn": 0L,
+    ];
+    static gNormalRaceTrophies = gLicenseTrophies;
+    static gProRaceTrophies = gLicenseTrophies;
+    static gAceRaceTrophies = gLicenseTrophies;
+
+    static gLastTrophyChange = ["", 0L, 0L]; // str: course, int: old_trophy, int: new_trophy
+    static gPrizeEventStack = [];
+
+    static gRaceSetup = [
+        "laps": 2,                          // number of laps
+        "rival": true,                      // rival mode: car 5 is preset based on current car & has tyre advantage
+        "rival_special": false,             // rival starts before the countdown! cheater!
+        "force_onemake": false,             // ignore AI group & rival, force one-make race
+        "opponents": 5,                     // number of AI opponents on road courses
+        "dirt_opponents": 1,                // number of AI opponents on dirt courses
+        "dirt_headstart": 20,               // headstart per AI car on dirt courses
+        "ai_skill": [100, 100, 100, 100],   // AI skill: generic, accel, brake, corner
+
+        // car label, category, has dirt tyres, AI group, AI rival
+        "car": ["ka_01", 0, true, nil, nil],
+
+        // 0 = OFF, 1 = TCS, 2 = TCS & ESC
+        "assists": 2,
+        "automatic": true,
+
+        "preset_ai": false,
+        "ai": [
+            "ka_01",
+            "ka_01",
+            "ka_01",
+            "ka_01",
+            "ka_01"
+        ],
+
+        "track": "midfield",
+        "is_dirt": false
+    ];
+
+    static gDataRoot = "/APP_DATA_RAW/gtc";
+    static gDataTrophies = "%{gDataRoot}/trophy.dat";
+
+    static gDEV_LastTrophyChangeOverride = nil; //["midfield", 2L];
+
+    #include "projects/gt6/gtconcept/gtc_carlist.ad"
+
+    function getCarData(label)
+    {
+        foreach (var data in gCarData)
+        {
+            if (data[0] == label)
+            {
+                debugLog("data=%{data}");
+                return data;
+            }
+        }
+        debugLog("label=%{label} NOT FOUND");
+    }
+
+    function generateEnemyCarList()
+    {
+        // TODO: PREFER REMOVING RIVAL CAR OVER PLAYER CAR
+        //       NOT SURE WHY THIS ISN'T THE CASE ALREADY
+        //       A GOOD EXAMPLE IS WITH THE gt500_00 AI GROUP
+        //       PROBABLY AFFECTS ALL GROUPS WITH 5 AI ENTRIES
+        //       WHERE BOTH PLAYER AND RIVAL ARE IN THE LIST
+        var [car_label, car_category, has_dirt_tyres, ai_group_name, rival_label] = gRaceSetup["car"];
+
+        // also force onemake if not all the AI group are dirt enabled
+        var forced_onemake = gRaceSetup["force_onemake"] || (gRaceSetup["is_dirt"] && gAIGroupsDirt.indexOf(ai_group_name) == -1);
+
+        var ai_list = [];
+        var regular_ai_count = gRaceSetup["opponents"];
+        // swap out the opponent count if this is a dirt event
+        if (gRaceSetup["is_dirt"])
+            regular_ai_count = gRaceSetup["dirt_opponents"];
+
+        // if we need a rival, generate one less entry & add it now
+        if (gRaceSetup["rival"] && !forced_onemake && rival_label != nil)
+        {
+            ai_list.append([rival_label]);
+            regular_ai_count -= 1;
+        }
+
+        var ai_group = [car_label];
+        if (ai_group_name != nil && !forced_onemake)
+        {
+            ai_group = [];
+            ai_group += gAIGroups[ai_group_name];
+
+            // if the AI group is large enough to be unique
+            if (regular_ai_count < ai_group.size)
+            {
+                var pcar_index = ai_group.indexOf(car_label);
+                var rcar_index = ai_group.indexOf(rival_label);
+                // & (player car and rival car are the same OR player car is not a road car) & they're in the AI group & the AI group contains more than just them
+                if ((car_label == rival_label || car_category > EnumCarCategory::Europe) && pcar_index != -1 && ai_group.size > 1)
+                {
+                    // remove it from the AI group
+                    ai_group.erase(pcar_index);
+                }
+
+                // early check to prevent crash
+                if (rival_label != nil)
+                {
+                    // & if using a rival & rival car is not a road car & they're in the AI group & the AI group contains more than just them
+                    if (gRaceSetup["rival"] && getCarData(rival_label)[1] > EnumCarCategory::Europe && rcar_index != -1 && ai_group.size > 1)
+                    {
+                        // remove it from the AI group
+                        ai_group.erase(rcar_index);
+                    }
+                }
+            }
+        }
+
+        // repeatedly add the list until it fits all the opponents we need
+        var ai_group_large = [];
+        while (ai_group_large.size <= regular_ai_count)
+        {
+            ai_group_large += ai_group;
+        }
+        ai_group_large.randomShuffle();
+
+        // if the rival car is in the AI group, remove it once (so long as this doesn't break the list)
+        //  this fixes enemy list generation with 2 AI matching the rival car but every other AI is unique
+        var rcar_index = ai_group_large.indexOf(rival_label);
+        if (rcar_index != -1 && !forced_onemake && ai_group.size > 1 && ai_group_large.size > regular_ai_count)
+        {
+            ai_group_large.erase(rcar_index);
+        }
+
+        // if the player car is in the AI group, remove it once (so long as this doesn't break the list)
+        //  this fixes enemy list generation with 2 AI matching the player car but every other AI is unique
+        var pcar_index = ai_group_large.indexOf(car_label);
+        if (pcar_index != -1 && !forced_onemake && ai_group.size > 1 && ai_group_large.size > regular_ai_count)
+        {
+            ai_group_large.erase(pcar_index);
+        }
+
+        // pop random entries from the resized group into our list
+        for (var i = 0; i < regular_ai_count; i++)
+        {
+            ai_list.append([ai_group_large.pop()]);
+        }
+
+        // reverse the list so that any rival is always the last entry
+        gRaceSetup["ai"] = ai_list.reverse();
+    }
+
+    function createTrophies(context)
+    {
+        // save our clean trophy list
+        if (!pdistd::Exist(gDataRoot))
+        {
+            pdistd::MakeDirectoryForFile(gDataTrophies);
+        }
+        saveTrophies(context);
+
+        // reset the basegame save trophies
+        var gp = GameParameterUtil::createFromFile("game_parameter/gt6/event/r2200.xml");
+        for (var i=0; i<gp.events.size; i++)
+        {
+            //TODO: doesn't work!!!
+            GAME_STATUS.user_profile.record.event_record.updateResultOnly(gp.events[i].event_id, 0);
+        }
+    }
+
+    function loadTrophies(context)
+    {
+        // load from file
+        if (!pdistd::Exist(gDataTrophies))
+        {
+            createTrophies(context);
+        }
+        var fst = pdistd::ReadFile(gDataTrophies);
+        var buf = fst["buffer"];
+        if (buf != nil)
+        {
+            var allTrophies = [:];
+            allTrophies.deserialize(buf);
+            gLicenseTrophies = allTrophies["L"];
+            gNormalRaceTrophies = allTrophies["N"];
+            gProRaceTrophies = allTrophies["P"];
+            gAceRaceTrophies = allTrophies["A"];
+        }
+
+        // initialize event data
+        var folder_info = EventRace2.decodeOfflineEventList("/game_parameter/gt6/event/gtc_course_license.xml")[0];
+        GAME_STATUS.user_profile.context.event_name = "gtc_course_license";
+        GAME_STATUS.user_profile.record.event_record.initializeRecord(
+            folder_info["event_id_list"],
+            folder_info["event_type"],
+            folder_info["id"],
+            0,    // category is always 0 (why?)
+            false // offline event
+        );
+
+        // Course License check
+        var gp = GameParameterUtil::createFromFile("game_parameter/gt6/event/r2200.xml");
+        var updated = false;
+        for (var i=0; i<gp.events.size; i++)
+        {
+            var course_label;
+            var result;
+            if (gDEV_LastTrophyChangeOverride != nil)
+            {
+                // DEVELOPER CHEAT FOR RPCS3
+                course_label = gDEV_LastTrophyChangeOverride[0];
+                result = gDEV_LastTrophyChangeOverride[1];
+            }
+            else
+            {
+                course_label = gtengine::MSpecDB::getCourseLabel(gp.events[i].track.course_code);
+                var event = gp.events[i];
+                var [eval_type, best_record] = GAME_STATUS.user_profile.record.event_record.getBestRecord(event.event_id);
+                if (best_record == -1)
+                    result = 0;
+                else
+                    result = (best_record <= event.eval_condition.gold) ? 1 : ((best_record <= event.eval_condition.silver) ? 2 : ((best_record <= event.eval_condition.bronze) ? 3 : 4));
+            }
+
+            if (result >= 1 && result <= 3 && (result < gLicenseTrophies[course_label] || gLicenseTrophies[course_label] == 0))
+            {
+                // log the latest change in a static here
+                gLastTrophyChange = [course_label, gLicenseTrophies[course_label], result];
+                // and update to match
+                gLicenseTrophies[course_label] = result;
+                debugLog("loadTrophies.loop: gLastTrophyChange: %{gLastTrophyChange}");
+                updated = true;
+                // break because only one event can ever change at once
+                break;
+            }
+        }
+
+        //TODO: Normal race check
+
+        //TODO: Pro race check
+
+        //TODO: Ace race check
+
+        if (updated == true)
+        {
+            debugLog("loadTrophies.end: updated gLicenseTrophies: %{gLicenseTrophies}")
+            saveTrophies(context);
+        }
+    }
+
+    function saveTrophies(context)
+    {
+        // save to file
+        var allTrophies = [
+            "L": gLicenseTrophies,
+            "N": gNormalRaceTrophies,
+            "P": gProRaceTrophies,
+            "A": gAceRaceTrophies
+        ];
+        pdistd::WriteFile(gDataTrophies, allTrophies.serialize());
+    }
+
+    function testForRewards(context)
+    {
+        var gotReward = false;
+        var [lastTrophyCourse, lastTrophyOld, lastTrophyNew] = gLastTrophyChange;
+        if (lastTrophyCourse != "")
+        {
+            if (lastTrophyNew > 0 && lastTrophyNew <= 3 && (lastTrophyOld > 3 || lastTrophyOld == 0))
+            {
+                // award Bronze
+                gPrizeEventStack.append(["%{lastTrophyCourse}_license_bronze"]);
+                gotReward = true;
+            }
+            if (lastTrophyNew == 1 && lastTrophyOld != 1)
+            {
+                // award Gold
+                gPrizeEventStack.append(["%{lastTrophyCourse}_license_gold"]);
+                gotReward = true;
+            }
+        }
+
+        return gotReward;
+    }
+
+    function onLoad(context)
+    { try {
+        context.createRenderContext(1);
+        var render_context = context.getRenderContext(0);
+
+        gUIKitProject = main::manager.loadProject("/" + main::PROJECT_ROOT_DIR + "/ui_kit/ui_kit");
+
+        if (gMenuSoundHolder == nil)
+        {
+            gMenuSoundHolder = pdiext::MSoundEffect("sound_gt/se/gtcmenu.sgd");
+            main::sound.code_map["cursor"] = "";
+        }
+
+        loadTrophies(render_context);
+
+        ProjectHistoryUtil::DefineVariables(GTConceptProject, [
+                [$"ReturnPage", nil],
+                [$"ReturnPageArg", nil],
+        ]);
+
+        if (gDEV_LastTrophyChangeOverride != nil)
+        {
+            GTConceptProject.history[$"ReturnPage"] = CourseLicenseRoot.name;
+            GTConceptProject.history[$"ReturnPageArg"] = 2;
+        }
+
+        var returning_page = GTConceptProject.history[$"ReturnPage"];
+        if (returning_page != nil && GTConceptProject.defined(returning_page))
+        {
+            GTConceptProject.history[$"ReturnPage"] = nil;
+
+            // slap that GTC menu music on
+            SoundUtil::MenuBGMCrossfadeGroup("gtc_mmenu", 0f, 0f, SoundUtil::REPEAT_TRACK);
+
+            // ignore return page and go to GameStatus if we got a reward
+            if (testForRewards(render_context))
+                GTConceptProject[GameStatusRoot.name].open(render_context);
+            else
+                GTConceptProject[returning_page].open(render_context);
+        }
+        else
+        {
+            SequenceUtil::startPage(render_context, TopRoot);
+        }
+    } catch (e) { pdistd::AppendFile("/APP_DATA_RAW/error.txt", "%{e}\n"); }}
+
+    function onUnload(context)
+    {
+        if (gMenuSoundHolder != nil)
+        {
+            gMenuSoundHolder = nil;
+            main::sound.code_map["cursor"] = "cursor";
+        }
+        if (gUIKitProject != nil)
+        {
+            main::manager.unloadProject(gUIKitProject);
+            gUIKitProject = nil;
+        }
+    }
+
+    function toggleDebug()
+    {
+        gDebugEnabled = !gDebugEnabled;
+    }
+
+    function debugLog(text)
+    {
+        if (gDebugEnabled)
+        {
+            pdistd::AppendFile("/APP_DATA_RAW/debug.txt", "%{text}\n");
+        }
+    }
+
+    function isDevelop(context)
+    {
+        return true;
+    }
+
+    function isDemo(context)
+    {
+        // Course License demo, public release 20XX
+        return false;
+    }
+
+    function getVersionText(context)
+    {
+        if (isDevelop(context) == true)
+        {
+            if (isDemo(context) == true)
+            {
+                return " DEV\n COURSE LICENSE TEST";
+            }
+            return " DEV\n ";
+        }
+        if (isDemo(context) == true)
+        {
+            return " COURSE LICENSE TEST";
+        }
+        return "";
+    }
+}

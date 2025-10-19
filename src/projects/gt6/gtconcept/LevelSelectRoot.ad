@@ -1,0 +1,206 @@
+module LevelSelectRoot
+{
+    static sInitialFocus = true;
+
+    method onInitialize(context)
+    {
+        MovieFace.play_movie(context);
+
+        sInitialFocus = true;
+        LevelSelectRoot.setFocus(Menu::Normal);
+    }
+
+    method onFinalize(context)
+    {
+        MovieFace.stop_movie(context);
+        return 2;
+    }
+
+    method onCancel(context)
+    {
+        sound.playSingle("gtc_exit");
+        SequenceUtil::startPage(context, MainMenuRoot);
+        return 2;
+    }
+
+    method changeSelection(context, id)
+    {
+        if (sInitialFocus == true)
+            sInitialFocus = false;
+        else
+            sound.playSingle("gtc_move");
+    }
+
+    method nextScreen(context)
+    {
+        sound.playSingle("gtc_select");
+        if (gDebugEnabled)
+        {
+            var keyState = context.getUpdateContext().getPadButtonState(0);
+            if (keyState & 16)
+            {
+                SequenceUtil::startPage(context, DebugEnemySelectionRoot);
+                return 2;
+            }
+        }
+        DialogUtil::openConfirmDialog(context, DialogUtil::ERROR, "TODO");
+        //SequenceUtil::startPage(context, CourseSelectRoot);
+        return 2;
+    }
+
+    module Menu
+    {
+        module Beginner
+        {
+            method onFocusEnter(context) { LevelSelectRoot.changeSelection(context, 0); }
+            method onActivate(context)
+            {
+                gRaceSetup = [
+                    "laps": 1,
+                    "rival": false,
+                    "rival_special": false,
+                    "force_onemake": true,
+                    "opponents": 3,
+                    "dirt_opponents": 1,
+                    "dirt_headstart": 10,
+                    "ai_skill": [90, 90, 90, 90],
+                    "car": ["ka_01", 0, true, nil, nil],
+                    "assists": 2,
+                    "automatic": true,
+                    "preset_ai": false,
+                    "ai": [
+                        "ka_01",
+                        "ka_01",
+                        "ka_01"
+                    ],
+                    "track": "midfield",
+                    "is_dirt": false
+                ];
+                return LevelSelectRoot.nextScreen(context);
+            }
+            method onCancel(context) { return LevelSelectRoot.onCancel(context); }
+        }
+        module Normal
+        {
+            method onFocusEnter(context) { LevelSelectRoot.changeSelection(context, 1); }
+            method onActivate(context)
+            {
+                gRaceSetup = [
+                    "laps": 2,
+                    "rival": true,
+                    "rival_special": false,
+                    "force_onemake": false,
+                    "opponents": 5,
+                    "dirt_opponents": 1,
+                    "dirt_headstart": 20,
+                    "ai_skill": [100, 100, 100, 100],
+                    "car": ["ka_01", 0, true, nil, nil],
+                    "assists": 2,
+                    "automatic": true,
+                    "preset_ai": false,
+                    "ai": [
+                        "ka_01",
+                        "ka_01",
+                        "ka_01",
+                        "ka_01",
+                        "ka_01"
+                    ],
+                    "track": "midfield",
+                    "is_dirt": false
+                ];
+                return LevelSelectRoot.nextScreen(context);
+            }
+            method onCancel(context) { return LevelSelectRoot.onCancel(context); }
+        }
+        module Professional
+        {
+            method onFocusEnter(context) { LevelSelectRoot.changeSelection(context, 2); }
+            method onActivate(context)
+            {
+                gRaceSetup = [
+                    "laps": 3,
+                    "rival": true,
+                    "rival_special": false,
+                    "force_onemake": false,
+                    "opponents": 5,
+                    "dirt_opponents": 1,
+                    "dirt_headstart": 30,
+                    "ai_skill": [105, 105, 105, 105],
+                    "car": ["ka_01", 0, true, nil, nil],
+                    "assists": 2,
+                    "automatic": true,
+                    "preset_ai": false,
+                    "ai": [
+                        "ka_01",
+                        "ka_01",
+                        "ka_01",
+                        "ka_01",
+                        "ka_01"
+                    ],
+                    "track": "midfield",
+                    "is_dirt": false
+                ];
+                return LevelSelectRoot.nextScreen(context);
+            }
+            method onCancel(context) { return LevelSelectRoot.onCancel(context); }
+        }
+        module Ace
+        {
+            method onFocusEnter(context) { LevelSelectRoot.changeSelection(context, 3); }
+            method onActivate(context)
+            {
+                gRaceSetup = [
+                    "laps": 5,
+                    "rival": true,
+                    "rival_special": true,
+                    "force_onemake": false,
+                    "opponents": 5,
+                    "dirt_opponents": 2,
+                    "dirt_headstart": 50,
+                    "ai_skill": [107, 107, 107, 107],
+                    "car": ["ka_01", 0, true, nil, nil],
+                    "assists": 2,
+                    "automatic": true,
+                    "preset_ai": false,
+                    "ai": [
+                        "ka_01",
+                        "ka_01",
+                        "ka_01",
+                        "ka_01",
+                        "ka_01"
+                    ],
+                    "track": "midfield",
+                    "is_dirt": false
+                ];
+                return LevelSelectRoot.nextScreen(context);
+            }
+            method onCancel(context) { return LevelSelectRoot.onCancel(context); }
+        }
+        module GT
+        {
+            method onFocusEnter(context) { LevelSelectRoot.changeSelection(context, 4); }
+            method onActivate(context)
+            {
+                sound.playSingle("gtc_select");
+                DialogUtil::openConfirmDialog(context, DialogUtil::ERROR, "TODO");
+                //SequenceUtil::startPage(context, GTLevelSettingsRoot);
+                return 2;
+            }
+            method onCancel(context) { return LevelSelectRoot.onCancel(context); }
+        }
+    }
+
+    module MovieFace
+    {
+        method play_movie(context)
+        {
+            var movie_file = "/movies/gtc/level_gtc";
+            self.load(context, movie_file);
+        }
+        method stop_movie(context)
+        {
+            self.pause(true);
+            self.unload();
+        }
+    }
+}

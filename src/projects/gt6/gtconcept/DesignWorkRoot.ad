@@ -1,0 +1,821 @@
+function dumpModule(obj)
+{
+    var str = "";
+    if (obj.isInstanceOf(Module))
+    {
+        str += "Module Name: %{obj.name}<br>";
+        str += "Module Path: %{obj.getModulePath()}<br>";
+        str += "Symbols for Module '%{obj.name}' (%{obj.getMapCount()} elements)<br><br>";
+        str += dumpMap(obj);
+    }
+
+    return str;
+}
+
+function dumpArray(arr)
+{
+    var str = "";
+    for (var i = 0; i < arr.getArrayCount(); i++)
+        str += "[%{i}] %{arr[i]}<br>";
+    
+    return str;
+}
+
+function dumpMap(map)
+{
+    var str = "";
+    foreach (var [k, v] in map)
+        str += "[%{k}] = %{v}<br>";
+    
+    return str;
+}
+
+function dumpObject(obj)
+{
+    if (obj == nil)
+        return "dumpObject: Object is nil";
+
+    var str = "";
+
+    str += "<b>Object Info</b> <br>";
+    str += "rc_size: %{obj.rc_size}<br>";
+    str += "rc_class: %{obj.rc_class}<br>";
+    str += "rc_count: %{obj.rc_count}<br>";
+    str += "weak_count: %{obj.weak_count}<br>";
+    str += "class_id: %{obj.class_id}<br>";
+    str += "hasPrimitiveInterface: %{obj.hasPrimitiveInterface()} <br>";
+    str += "hasArrayInterface: %{obj.hasArrayInterface()} <br>";
+    if (obj.hasArrayInterface()) 
+        str += "getArrayCount: %{obj.getArrayCount()} <br>";
+
+    str += "hasMapInterface: %{obj.hasMapInterface()} <br>";
+    if (obj.hasMapInterface())
+        str += "getMapCount: %{obj.getMapCount()} <br>";
+
+    str += "hasGeneratorInterface: %{obj.hasGeneratorInterface()} <br>";
+    if (obj.hasGeneratorInterface())
+        str += "generator: %{obj.generator} <br>";
+
+    str += "hasVariableInterface: %{obj.hasVariableInterface()} <br>";
+    str += "hasFunctionInterface: %{obj.hasFunctionInterface()} <br>";
+    str += "hasByteDataInterface: %{obj.hasByteDataInterface()} <br>";
+    if (obj.hasByteDataInterface())
+        str += "getByteDataCount: %{obj.getByteDataCount()} <br>";
+
+    str += "hasObjectSelectorInterface: %{obj.hasObjectSelectorInterface()}<br><br>";
+
+    str += "<b>Object Class Info (class_id)</b><br>"
+    str += dumpModule(obj.class_id);
+    str += "<br>";
+    str += "<b>Module Class Info</b><br>"
+    str += dumpModule(obj);
+
+    str += "<br>";
+
+    if (obj.hasArrayInterface())
+    {
+        str += "<b>Array Info (%{obj.getArrayCount()} elements)</b><br>";
+        str += dumpArray(obj);
+    }
+
+    if (obj.hasMapInterface())
+    {
+        str += "<b>Map Info (%{obj.getMapCount()} elements)</b><br>";
+        str += dumpMap(obj);
+    }
+
+    return str;
+}
+
+// ==================================================
+// actual design work
+// ==================================================
+
+module DesignWorkRoot_Page1 // align test
+{
+    method onInitialize(context)
+    {
+        DesignWorkRoot_Page1.setFocus(DesignWorkRoot_Page1);
+    }
+    method onKeyPress(context, event)
+    {
+        if (event.keysym == CELL_PAD_CTRL_CROSS) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page2);
+        } else if (event.keysym == CELL_PAD_CTRL_TRIANGLE) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page22);
+        }
+    }
+    method onCancel(context)
+    {
+        sound.playSingle("gtc_exit");
+        SequenceUtil::startPage(context, TopRoot);
+        return 2;
+    }
+}
+
+module DesignWorkRoot_Page2 // movie test
+{
+    static sMovieId = 0;
+    static sMovieList = [
+        "/movies/gtc/arcade_menu_gtc",
+        "/movies/gtc/category_gtc",
+        "/movies/gtc/ending_GTC",
+        "/movies/gtc/ending_long_full",
+        "/movies/gtc/level_gtc",
+        "/movies/gtc/opening",
+        "/movies/gtc/opening_GTCJP",
+        "/movies/gtc/tvcm_GTCJP1",
+        "/movies/gtc/tvcm_GTCJP2"
+    ];
+
+    method onInitialize(context)
+    {
+        DesignWorkRoot_Page2.setFocus(DesignWorkRoot_Page2);
+        MovieName.text = " %{sMovieList[sMovieId]} ";
+        MovieFace.play_movie(context);
+    }
+    method onFinalize(context)
+    {
+        MovieFace.stop_movie(context);
+        return 2;
+    }
+    method onKeyPress(context, event)
+    {
+        if (event.keysym == CELL_PAD_CTRL_CROSS) {
+            MovieFace.end_movie(context);
+            SequenceUtil::startPage(context, DesignWorkRoot_Page3);
+        } else if (event.keysym == CELL_PAD_CTRL_TRIANGLE) {
+            MovieFace.end_movie(context);
+            SequenceUtil::startPage(context, DesignWorkRoot_Page1);
+        } else if (event.keysym == CELL_PAD_CTRL_L3_RIGHT) {
+            MovieFace.end_movie(context);
+            MovieFace.stop_movie(context);
+            sMovieId = (sMovieId + 1) % sMovieList.size;
+            MovieName.text = " %{sMovieList[sMovieId]} ";
+            MovieFace.play_movie(context);
+        } else if (event.keysym == CELL_PAD_CTRL_L3_LEFT) {
+            MovieFace.end_movie(context);
+            MovieFace.stop_movie(context);
+            sMovieId = (sMovieId - 1 + sMovieList.size) % sMovieList.size;
+            MovieName.text = " %{sMovieList[sMovieId]} ";
+            MovieFace.play_movie(context);
+        }
+    }
+    method onCancel(context)
+    {
+        sound.playSingle("gtc_exit");
+        MovieFace.end_movie(context);
+        SequenceUtil::startPage(context, TopRoot);
+        return 2;
+    }
+
+    module MovieFace
+    {
+        method play_movie(context)
+        {
+            self.audio_level = SoundUtil::GetMovieVolume();
+            self.audio_track = -1;
+
+            var movie_file = sMovieList[sMovieId];
+            self.load(context, movie_file);
+        }
+        method stop_movie(context)
+        {
+            self.unload();
+        }
+        method end_movie(context)
+        {
+            self.pause(true);
+            context.wait();
+            context.wait();
+        }
+    }
+}
+
+module DesignWorkRoot_Page3 // sound test
+{
+    static sSoundId = 0;
+    static sSoundList = [];
+
+    method onInitialize(context)
+    {
+        DesignWorkRoot_Page3.setFocus(DesignWorkRoot_Page3);
+        sSoundList = sound.getEffectCodeList();
+        SoundName.text = " %{sSoundList[sSoundId]} ";
+    }
+    method onKeyPress(context, event)
+    {
+        if (event.keysym == CELL_PAD_CTRL_CROSS) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page4);
+        } else if (event.keysym == CELL_PAD_CTRL_TRIANGLE) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page2);
+        } else if (event.keysym == CELL_PAD_CTRL_L3_RIGHT) {
+            sSoundId = (sSoundId + 1) % sSoundList.size;
+            SoundName.text = " %{sSoundList[sSoundId]} ";
+            sound.playSingle(sSoundList[sSoundId]);
+        } else if (event.keysym == CELL_PAD_CTRL_L3_LEFT) {
+            sSoundId = (sSoundId - 1 + sSoundList.size) % sSoundList.size;
+            SoundName.text = " %{sSoundList[sSoundId]} ";
+            sound.playSingle(sSoundList[sSoundId]);
+        }
+    }
+    method onCancel(context)
+    {
+        sound.playSingle("gtc_exit");
+        SequenceUtil::startPage(context, TopRoot);
+        return 2;
+    }
+}
+
+module DesignWorkRoot_Page4 // car model test
+{
+    attribute carx = 4.5f;
+    attribute cary = -1.5f;
+    attribute carz = 0f;
+    attribute carr = 0f;
+    attribute moveCamera = false;
+    attribute camx = 0f;
+    attribute camy = 1f;
+    attribute camz = 6.5f;
+    attribute camfov = 25f;
+
+    method updateModel()
+    {
+        PosText.text = " CAR:\n x = %{self.carx}\n y = %{self.cary}\n z = %{self.carz}\n r = %{self.carr}\n CAMERA:\n x = %{self.camx}\n y = %{self.camy}\n z = %{self.camz}\n f = %{self.camfov}\n moveCam = %{self.moveCamera}";
+        SceneFace.execCommand("setModelTranslation %{self.carx} %{self.cary} %{self.carz} car0");
+        SceneFace.execCommand("setModelRotation 0 %{self.carr} 0 car0");
+        SceneFace.execCommand("setCameraLookAt %{self.carx} %{self.cary} %{self.carz}");
+        SceneFace.execCommand("setCameraPosition %{self.camx} %{self.camy} %{self.camz}");
+        SceneFace.execCommand("setCameraFovY %{self.camfov}");
+    }
+
+    method onInitialize(context)
+    { try {
+        var cp = gtengine::MCarParameter(gtengine::MSpecDB::getCarCode("gtr_concept_tmv_01"));
+        SceneFace.resetCommandQueue();
+        SceneFace.setDefaultCarParameter(cp, 0);
+        SceneFace.execCommand("changeCar _default car0");
+        SceneFace.execCommand("resetGlobalMotionFrame");
+        SceneFace.execCommand("setCameraMotionEnable 0");
+        updateModel();
+
+        DesignWorkRoot_Page4.setFocus(DesignWorkRoot_Page4);
+    } catch (e) { pdistd::AppendFile("/APP_DATA_RAW/error.txt", "%{e}\n"); }}
+    method onKeyPress(context, event)
+    { try {
+        if (event.keysym == CELL_PAD_CTRL_CROSS) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page5);
+        } else if (event.keysym == CELL_PAD_CTRL_TRIANGLE) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page3);
+        }
+
+        if (event.keysym == CELL_PAD_CTRL_R1) {
+            moveCamera = !moveCamera;
+        }
+
+        if (moveCamera)
+        {
+            if (event.keysym == CELL_PAD_CTRL_L3_LEFT) {
+                self.camx -= 0.1f;
+            } else if (event.keysym == CELL_PAD_CTRL_L3_RIGHT) {
+                self.camx += 0.1f;
+            } else if (event.keysym == CELL_PAD_CTRL_L3_UP) {
+                self.camy -= 0.1f;
+            } else if (event.keysym == CELL_PAD_CTRL_L3_DOWN) {
+                self.camy += 0.1f;
+            } else if (event.keysym == CELL_PAD_CTRL_R3_LEFT) {
+                self.camfov -= 1f;
+            } else if (event.keysym == CELL_PAD_CTRL_R3_RIGHT) {
+                self.camfov += 1f;
+            } else if (event.keysym == CELL_PAD_CTRL_R3_UP) {
+                self.camz -= 0.1f;
+            } else if (event.keysym == CELL_PAD_CTRL_R3_DOWN) {
+                self.camz += 0.1f;
+            }
+        } else {
+            if (event.keysym == CELL_PAD_CTRL_L3_LEFT) {
+                self.carx -= 0.1f;
+            } else if (event.keysym == CELL_PAD_CTRL_L3_RIGHT) {
+                self.carx += 0.1f;
+            } else if (event.keysym == CELL_PAD_CTRL_L3_UP) {
+                self.cary -= 0.1f;
+            } else if (event.keysym == CELL_PAD_CTRL_L3_DOWN) {
+                self.cary += 0.1f;
+            } else if (event.keysym == CELL_PAD_CTRL_R3_LEFT) {
+                self.carr -= 5f;
+            } else if (event.keysym == CELL_PAD_CTRL_R3_RIGHT) {
+                self.carr += 5f;
+            } else if (event.keysym == CELL_PAD_CTRL_R3_UP) {
+                self.carz -= 0.1f;
+            } else if (event.keysym == CELL_PAD_CTRL_R3_DOWN) {
+                self.carz += 0.1f;
+            }
+        }
+
+        updateModel();
+    } catch (e) { pdistd::AppendFile("/APP_DATA_RAW/error.txt", "%{self.e}\n"); }}
+    method onCancel(context)
+    {
+        sound.playSingle("gtc_exit");
+        SequenceUtil::startPage(context, TopRoot);
+        return 2;
+    }
+}
+
+module DesignWorkRoot_Page5 // graph test
+{
+    method onInitialize(context)
+    { try {
+        DesignWorkRoot_Page5.setFocus(DesignWorkRoot_Page5);
+
+        Graph::Power::label.text = pdiext::MUnit::GetUnitOfPower();
+        Graph::Torque::label.text = pdiext::MUnit::GetUnitOfTorque();
+        Graph::RPM::label.text = pdiext::MUnit::GetUnitOfRpm();
+
+        var gf_list = [Graph::Graph::gf_power, Graph::Graph::gf_torque];
+        foreach (var gf in gf_list)
+        {
+            gf.type = "line";
+            gf.line_width = 4.0f;
+            gf.action_enabled = true;
+            gf.index = 0.0f;
+            gf.velocity = 0.0f;
+            gf.scale = [1, -1];
+        }
+
+        var carcode = gtengine::MSpecDB::getCarCode("gtr_concept_tmv_01");
+        var cp = gtengine::MCarParameter(carcode);
+        Graph.set(context, cp);
+    } catch (e) { pdistd::AppendFile("/APP_DATA_RAW/error.txt", "%{e}\n"); }}
+    method onKeyPress(context, event)
+    {
+        if (event.keysym == CELL_PAD_CTRL_CROSS) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page6);
+        } else if (event.keysym == CELL_PAD_CTRL_TRIANGLE) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page4);
+        }
+    }
+    method onCancel(context)
+    {
+        sound.playSingle("gtc_exit");
+        SequenceUtil::startPage(context, TopRoot);
+        return 2;
+    }
+
+    module Graph
+    {
+        method set(context, cp)
+        {
+            Graph::line_power.visible = true;
+            Graph::line_torque.visible = true;
+
+            var car_code = cp.getCarCode();
+            var cp_real;
+            if (cp.isInstanceOf(gtengine::MCarThin))
+                cp_real = gtengine::MCarParameter(car_code);
+            else
+                cp_real = cp;
+
+            cp_real.beginInfo();
+            var [power_data, torque_data, maxPS, maxTorque, curveRPM, revLimitRPM,
+                 powerMaxX, torqueMaxX] = cp_real.buildEngineData(true, 0.0f, 0.0f, 0.95f, 0.85f);
+
+            Topbar::Weight.text = cp_real.getWeightString();
+            cp_real.endInfo();
+            Topbar::Drivetrain.text = SpecDatabaseUtil::getCarDrivetrainText(context, car_code);
+
+            var trMaxPS = pdiext::MUnit::GetPowerForDisplay(maxPS);
+            var trMaxTorque = pdiext::MUnit::GetTorqueForDisplayF(maxTorque);
+
+            Power::unit1.text = "%d".format(trMaxPS);
+            var fm = trMaxTorque >= 100.0f ? "%d" : "%.1f";
+            Torque::unit1.text = fm.format(trMaxTorque);
+            RPM::unit0.text = "%d".format(0);
+            RPM::unit1.text = "%d".format(revLimitRPM);   
+
+            var x = Graph::gf_power.w * powerMaxX;
+            x += Graph::gf_power.x;
+            x -= Graph::line_power.h * 0.5f;
+            Graph::line_power.x = x;
+
+            var x = Graph::gf_torque.w * torqueMaxX;
+            x += Graph::gf_torque.x;
+            x -= Graph::line_torque.h * 0.5f;
+            x -= Graph::line_torque.w;
+            Graph::line_torque.x = x;
+
+            var gf_list = [Graph::gf_power, Graph::gf_torque];
+            var i = 0;
+            foreach (var gf in gf_list)
+            {
+                gf.points = i == 0 ? power_data : torque_data;
+                gf.action_enabled = true;
+                gf.index = 0.0f;
+                gf.velocity = 90.0f;
+                i++;
+            }
+        }
+    }
+}
+
+module DesignWorkRoot_Page6
+{
+    method onInitialize(context)
+    {
+        DesignWorkRoot_Page6.setFocus(DesignWorkRoot_Page6);
+    }
+    method onKeyPress(context, event)
+    {
+        if (event.keysym == CELL_PAD_CTRL_CROSS) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page7);
+        } else if (event.keysym == CELL_PAD_CTRL_TRIANGLE) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page5);
+        }
+    }
+    method onCancel(context)
+    {
+        sound.playSingle("gtc_exit");
+        SequenceUtil::startPage(context, TopRoot);
+        return 2;
+    }
+}
+
+module DesignWorkRoot_Page7
+{
+    method onInitialize(context)
+    {
+        DesignWorkRoot_Page7.setFocus(DesignWorkRoot_Page7);
+    }
+    method onKeyPress(context, event)
+    {
+        if (event.keysym == CELL_PAD_CTRL_CROSS) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page8);
+        } else if (event.keysym == CELL_PAD_CTRL_TRIANGLE) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page6);
+        }
+    }
+    method onCancel(context)
+    {
+        sound.playSingle("gtc_exit");
+        SequenceUtil::startPage(context, TopRoot);
+        return 2;
+    }
+}
+
+module DesignWorkRoot_Page8
+{
+    method onInitialize(context)
+    {
+        DesignWorkRoot_Page8.setFocus(DesignWorkRoot_Page8);
+    }
+    method onKeyPress(context, event)
+    {
+        if (event.keysym == CELL_PAD_CTRL_CROSS) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page9);
+        } else if (event.keysym == CELL_PAD_CTRL_TRIANGLE) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page7);
+        }
+    }
+    method onCancel(context)
+    {
+        sound.playSingle("gtc_exit");
+        SequenceUtil::startPage(context, TopRoot);
+        return 2;
+    }
+}
+
+module DesignWorkRoot_Page9
+{
+    method onInitialize(context)
+    {
+        DesignWorkRoot_Page9.setFocus(DesignWorkRoot_Page9);
+    }
+    method onKeyPress(context, event)
+    {
+        if (event.keysym == CELL_PAD_CTRL_CROSS) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page10);
+        } else if (event.keysym == CELL_PAD_CTRL_TRIANGLE) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page8);
+        }
+    }
+    method onCancel(context)
+    {
+        sound.playSingle("gtc_exit");
+        SequenceUtil::startPage(context, TopRoot);
+        return 2;
+    }
+}
+
+module DesignWorkRoot_Page10
+{
+    method onInitialize(context)
+    {
+        DesignWorkRoot_Page10.setFocus(DesignWorkRoot_Page10);
+    }
+    method onKeyPress(context, event)
+    {
+        if (event.keysym == CELL_PAD_CTRL_CROSS) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page11);
+        } else if (event.keysym == CELL_PAD_CTRL_TRIANGLE) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page9);
+        }
+    }
+    method onCancel(context)
+    {
+        sound.playSingle("gtc_exit");
+        SequenceUtil::startPage(context, TopRoot);
+        return 2;
+    }
+}
+
+module DesignWorkRoot_Page11
+{
+    method onInitialize(context)
+    {
+        DesignWorkRoot_Page11.setFocus(DesignWorkRoot_Page11);
+    }
+    method onKeyPress(context, event)
+    {
+        if (event.keysym == CELL_PAD_CTRL_CROSS) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page12);
+        } else if (event.keysym == CELL_PAD_CTRL_TRIANGLE) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page10);
+        }
+    }
+    method onCancel(context)
+    {
+        sound.playSingle("gtc_exit");
+        SequenceUtil::startPage(context, TopRoot);
+        return 2;
+    }
+}
+
+module DesignWorkRoot_Page12 // trophy test
+{
+    static sEventId = 0;
+    static gp;
+
+    method onInitialize(context)
+    { try {
+        DesignWorkRoot_Page12.setFocus(DesignWorkRoot_Page12);
+        gp = GameParameterUtil::createFromFile("game_parameter/gt6/event/r2200.xml");
+        update(context);
+    } catch (e) { pdistd::AppendFile("/APP_DATA_RAW/error.txt", "%{e}\n"); }}
+    method onKeyPress(context, event)
+    { try {
+        if (event.keysym == CELL_PAD_CTRL_CROSS) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page13);
+        } else if (event.keysym == CELL_PAD_CTRL_TRIANGLE) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page11);
+        } else if (event.keysym == CELL_PAD_CTRL_L3_RIGHT) {
+            sEventId = (sEventId + 1) % gp.events.size;
+            update(context);
+        } else if (event.keysym == CELL_PAD_CTRL_L3_LEFT) {
+            sEventId = (sEventId - 1 + gp.events.size) % gp.events.size;
+            update(context);
+        }
+    } catch (e) { pdistd::AppendFile("/APP_DATA_RAW/error.txt", "%{e}\n"); }}
+    method update(context)
+    { try {
+        var event = gp.events[sEventId];
+
+        var course_label = gtengine::MSpecDB::getCourseLabel(event.track.course_code);
+        var id = event.event_id;
+
+        var [eval_type, best_record] = GAME_STATUS.user_profile.record.event_record.getBestRecord(id);
+        var result;
+        if (best_record == -1)
+            result = 0;
+        else
+            result = (best_record <= event.eval_condition.gold) ? 1 : ((best_record <= event.eval_condition.silver) ? 2 : ((best_record <= event.eval_condition.bronze) ? 3 : 4));
+
+        var saved_result = gLicenseTrophies[course_label];
+        TrophyText.text = " event_id=%{id} \n course=%{course_label} \n res=%{result} \n saved=%{saved_result} ";
+    } catch (e) { pdistd::AppendFile("/APP_DATA_RAW/error.txt", "%{e}\n"); }}
+    method onCancel(context)
+    {
+        sound.playSingle("gtc_exit");
+        SequenceUtil::startPage(context, TopRoot);
+        return 2;
+    }
+}
+
+module DesignWorkRoot_Page13
+{
+    method onInitialize(context)
+    {
+        DesignWorkRoot_Page13.setFocus(DesignWorkRoot_Page13);
+    }
+    method onKeyPress(context, event)
+    {
+        if (event.keysym == CELL_PAD_CTRL_CROSS) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page14);
+        } else if (event.keysym == CELL_PAD_CTRL_TRIANGLE) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page12);
+        }
+    }
+    method onCancel(context)
+    {
+        sound.playSingle("gtc_exit");
+        SequenceUtil::startPage(context, TopRoot);
+        return 2;
+    }
+}
+
+module DesignWorkRoot_Page14
+{
+    method onInitialize(context)
+    {
+        DesignWorkRoot_Page14.setFocus(DesignWorkRoot_Page14);
+    }
+    method onKeyPress(context, event)
+    {
+        if (event.keysym == CELL_PAD_CTRL_CROSS) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page15);
+        } else if (event.keysym == CELL_PAD_CTRL_TRIANGLE) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page13);
+        }
+    }
+    method onCancel(context)
+    {
+        sound.playSingle("gtc_exit");
+        SequenceUtil::startPage(context, TopRoot);
+        return 2;
+    }
+}
+
+module DesignWorkRoot_Page15
+{
+    method onInitialize(context)
+    {
+        DesignWorkRoot_Page15.setFocus(DesignWorkRoot_Page15);
+    }
+    method onKeyPress(context, event)
+    {
+        if (event.keysym == CELL_PAD_CTRL_CROSS) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page16);
+        } else if (event.keysym == CELL_PAD_CTRL_TRIANGLE) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page14);
+        }
+    }
+    method onCancel(context)
+    {
+        sound.playSingle("gtc_exit");
+        SequenceUtil::startPage(context, TopRoot);
+        return 2;
+    }
+}
+
+module DesignWorkRoot_Page16
+{
+    method onInitialize(context)
+    {
+        DesignWorkRoot_Page16.setFocus(DesignWorkRoot_Page16);
+    }
+    method onKeyPress(context, event)
+    {
+        if (event.keysym == CELL_PAD_CTRL_CROSS) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page17);
+        } else if (event.keysym == CELL_PAD_CTRL_TRIANGLE) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page15);
+        }
+    }
+    method onCancel(context)
+    {
+        sound.playSingle("gtc_exit");
+        SequenceUtil::startPage(context, TopRoot);
+        return 2;
+    }
+}
+
+module DesignWorkRoot_Page17
+{
+    method onInitialize(context)
+    {
+        DesignWorkRoot_Page17.setFocus(DesignWorkRoot_Page17);
+    }
+    method onKeyPress(context, event)
+    {
+        if (event.keysym == CELL_PAD_CTRL_CROSS) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page18);
+        } else if (event.keysym == CELL_PAD_CTRL_TRIANGLE) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page16);
+        }
+    }
+    method onCancel(context)
+    {
+        sound.playSingle("gtc_exit");
+        SequenceUtil::startPage(context, TopRoot);
+        return 2;
+    }
+}
+
+module DesignWorkRoot_Page18
+{
+    method onInitialize(context)
+    {
+        DesignWorkRoot_Page18.setFocus(DesignWorkRoot_Page18);
+    }
+    method onKeyPress(context, event)
+    {
+        if (event.keysym == CELL_PAD_CTRL_CROSS) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page19);
+        } else if (event.keysym == CELL_PAD_CTRL_TRIANGLE) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page17);
+        }
+    }
+    method onCancel(context)
+    {
+        sound.playSingle("gtc_exit");
+        SequenceUtil::startPage(context, TopRoot);
+        return 2;
+    }
+}
+
+module DesignWorkRoot_Page19
+{
+    method onInitialize(context)
+    {
+        DesignWorkRoot_Page19.setFocus(DesignWorkRoot_Page19);
+    }
+    method onKeyPress(context, event)
+    {
+        if (event.keysym == CELL_PAD_CTRL_CROSS) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page20);
+        } else if (event.keysym == CELL_PAD_CTRL_TRIANGLE) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page18);
+        }
+    }
+    method onCancel(context)
+    {
+        sound.playSingle("gtc_exit");
+        SequenceUtil::startPage(context, TopRoot);
+        return 2;
+    }
+}
+
+module DesignWorkRoot_Page20
+{
+    method onInitialize(context)
+    {
+        DesignWorkRoot_Page20.setFocus(DesignWorkRoot_Page20);
+    }
+    method onKeyPress(context, event)
+    {
+        if (event.keysym == CELL_PAD_CTRL_CROSS) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page21);
+        } else if (event.keysym == CELL_PAD_CTRL_TRIANGLE) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page19);
+        }
+    }
+    method onCancel(context)
+    {
+        sound.playSingle("gtc_exit");
+        SequenceUtil::startPage(context, TopRoot);
+        return 2;
+    }
+}
+
+module DesignWorkRoot_Page21
+{
+    method onInitialize(context)
+    {
+        DesignWorkRoot_Page21.setFocus(DesignWorkRoot_Page21);
+    }
+    method onKeyPress(context, event)
+    {
+        if (event.keysym == CELL_PAD_CTRL_CROSS) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page22);
+        } else if (event.keysym == CELL_PAD_CTRL_TRIANGLE) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page20);
+        }
+    }
+    method onCancel(context)
+    {
+        sound.playSingle("gtc_exit");
+        SequenceUtil::startPage(context, TopRoot);
+        return 2;
+    }
+}
+
+module DesignWorkRoot_Page22
+{
+    method onInitialize(context)
+    {
+        DesignWorkRoot_Page22.setFocus(DesignWorkRoot_Page22);
+    }
+    method onKeyPress(context, event)
+    {
+        if (event.keysym == CELL_PAD_CTRL_CROSS) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page1);
+        } else if (event.keysym == CELL_PAD_CTRL_TRIANGLE) {
+            SequenceUtil::startPage(context, DesignWorkRoot_Page21);
+        }
+    }
+    method onCancel(context)
+    {
+        sound.playSingle("gtc_exit");
+        SequenceUtil::startPage(context, TopRoot);
+        return 2;
+    }
+}

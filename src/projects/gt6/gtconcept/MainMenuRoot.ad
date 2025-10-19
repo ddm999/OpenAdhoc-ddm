@@ -1,0 +1,234 @@
+module MainMenuRoot
+{
+    static sTooltipText = [
+        "Course License tests: You must pass license tests for each course in order to enter races. When testing, you can follow the pace car to learn racing lines and braking points.",
+        "Single Race: Start here if you wish to enter races. Start at NORMAL level to hone your skills.",
+        "Two-player Battle: A split screen is used to show your car and that of your opponents' simultaneously. The number of laps and other options can be changed in the OPTIONS menu.",
+        "Free Run: Select your course and vehicle then drive for as long as you wish. Your fastest lap is always being recorded, so you can save your best lap as replay data.",
+        "Game Status: Shows how far through the game you have progressed. You can also see details of the cars you have acquired. Try for a 100% complete status!",
+    ];
+
+    static sInitialFocus = true;
+
+    method singleRaceEnabled(context)
+    {
+        foreach (var [course, trophy] in gLicenseTrophies)
+        {
+            // 1 = gold, 2 = silver, 3 = bronze
+            if (trophy > 0 && trophy < 4)
+                return true;
+        }
+        return false;
+    }
+
+    method onInitialize(context)
+    {
+        MovieFace.play_movie(context);
+        SoundUtil::MenuBGMCrossfadeGroup("gtc_mmenu", 0f, 0f, SoundUtil::REPEAT_TRACK);
+
+        sInitialFocus = true;
+        MainMenuRoot.setFocus(Menu::CourseLicense);
+
+        if (singleRaceEnabled(context)) {
+            // Single Race is enabled:
+            //  hide the locked graphic and show the unlocked one
+            Menu::SingleRace::base.visible = 1;
+            Menu::SingleRace::locked.visible = 0;
+        }
+
+        if (isDemo(context)) {
+            // Course License Demo
+            // lock Single Race (override unlock conditions), 2P, Free Run
+            Menu::SingleRace::base.visible = 0;
+            Menu::SingleRace::locked.visible = 1;
+            Menu::TwoPlayerBattle::base.visible = 0;
+            Menu::TwoPlayerBattle::locked.visible = 1;
+            Menu::FreeRun::base.visible = 0;
+            Menu::FreeRun::locked.visible = 1;
+        }
+
+        VersionText.text = getVersionText(context);
+    }
+
+    method onFinalize(context)
+    {
+        MovieFace.stop_movie(context);
+        return 2;
+    }
+
+    // disable left and right to prevent weird movement because our menu layout is curved
+    method onKeyPress(context, event)
+    {
+        if (event.keysym == CELL_PAD_CTRL_L3_LEFT || event.keysym == CELL_PAD_CTRL_L3_RIGHT)
+        {
+            return 2;
+        }
+        return 0;
+    }
+
+    method onCancel(context)
+    {
+        sound.playSingle("gtc_exit");
+        SoundUtil::BGMFadeout(1f);
+        SequenceUtil::startPage(context, TopRoot);
+        return 2;
+    }
+
+    method changeSelection(context, id)
+    {
+        if (sInitialFocus == true)
+            sInitialFocus = false;
+        else
+            sound.playSingle("gtc_move");
+
+        MarqueeBar::clipper::tip.text = sTooltipText[id];
+        MarqueeBar::clipper::tip.TranslateX.reset();
+        MarqueeBar::clipper::tip.TranslateX.start();
+        MarqueeBar::clipper::tip.FadeIn.reset();
+        MarqueeBar::clipper::tip.FadeIn.start();
+    }
+
+    module Menu
+    {
+        module CourseLicense
+        {
+            method onFocusEnter(context) { MainMenuRoot.changeSelection(context, 0); }
+            method onActivate(context)
+            {
+                context.disableInput();
+                sound.playSingle("gtc_select");
+                self.base.Flash.on_effect_end = self.flashEnd;
+                self.base.Flash.start();
+            }
+            method flashEnd(context)
+            {
+                context.enableInput();
+                SequenceUtil::startPage(context, CourseLicenseRoot);
+            }
+            method onCancel(context)
+            {
+                return MainMenuRoot.onCancel(context);
+            }
+        }
+
+        module SingleRace
+        {
+            method onFocusEnter(context) { MainMenuRoot.changeSelection(context, 1); }
+            method onActivate(context)
+            {
+                if (MainMenuRoot.singleRaceEnabled(context) && !isDemo(context)) {
+                    context.disableInput();
+                    sound.playSingle("gtc_select");
+                    self.base.Flash.on_effect_end = self.flashEnd;
+                    self.base.Flash.start();
+                } else if (isDemo(context)) {
+                    sound.playSingle("gtc_no");
+                    DialogUtil::openConfirmDialog(context, DialogUtil::ERROR, "Not available in Course License Demo.");
+                } else {
+                    sound.playSingle("gtc_no");
+                }
+            }
+            method flashEnd(context)
+            {
+                context.enableInput();
+                if (!gDebugEnabled)
+                    DialogUtil::openConfirmDialog(context, DialogUtil::ERROR, "TODO");
+                else
+                    SequenceUtil::startPage(context, LevelSelectRoot);
+            }
+            method onCancel(context)
+            {
+                return MainMenuRoot.onCancel(context);
+            }
+        }
+
+        module TwoPlayerBattle
+        {
+            method onFocusEnter(context) { MainMenuRoot.changeSelection(context, 2); }
+            method onActivate(context)
+            {
+                if (!isDemo(context)) {
+                    context.disableInput();
+                    sound.playSingle("gtc_select");
+                    self.base.Flash.on_effect_end = self.flashEnd;
+                    self.base.Flash.start();
+                } else {
+                    sound.playSingle("gtc_no");
+                    DialogUtil::openConfirmDialog(context, DialogUtil::ERROR, "Not available in Course License Demo.");
+                }
+            }
+            method flashEnd(context)
+            {
+                context.enableInput();
+                DialogUtil::openConfirmDialog(context, DialogUtil::ERROR, "TODO");
+                //SequenceUtil::startPage(context, TwoPlayerBattleRoot);
+            }
+            method onCancel(context)
+            {
+                return MainMenuRoot.onCancel(context);
+            }
+        }
+
+        module FreeRun
+        {
+            method onFocusEnter(context) { MainMenuRoot.changeSelection(context, 3); }
+            method onActivate(context)
+            {
+                if (!isDemo(context)) {
+                    context.disableInput();
+                    sound.playSingle("gtc_select");
+                    self.base.Flash.on_effect_end = self.flashEnd;
+                    self.base.Flash.start();
+                } else {
+                    sound.playSingle("gtc_no");
+                    DialogUtil::openConfirmDialog(context, DialogUtil::ERROR, "Not available in Course License Demo.");
+                }
+            }
+            method flashEnd(context)
+            {
+                context.enableInput();
+                DialogUtil::openConfirmDialog(context, DialogUtil::ERROR, "TODO");
+                //SequenceUtil::startPage(context, FreeRunRoot);
+            }
+            method onCancel(context)
+            {
+                return MainMenuRoot.onCancel(context);
+            }
+        }
+
+        module GameStatus
+        {
+            method onFocusEnter(context) { MainMenuRoot.changeSelection(context, 4); }
+            method onActivate(context)
+            {
+                context.disableInput();
+                sound.playSingle("gtc_select");
+                self.base.Flash.on_effect_end = self.flashEnd;
+                self.base.Flash.start();
+            }
+            method flashEnd(context)
+            {
+                context.enableInput();
+                SequenceUtil::startPage(context, GameStatusRoot);
+            }
+            method onCancel(context)
+            {
+                return MainMenuRoot.onCancel(context);
+            }
+        }
+    }
+
+    module MovieFace
+    {
+        method play_movie(context)
+        {
+            var movie_file = "/movies/gtc/arcade_menu_gtc";
+            self.load(context, movie_file);
+        }
+        method stop_movie(context)
+        {
+            self.pause(true);
+            self.unload();
+        }
+    }
+}

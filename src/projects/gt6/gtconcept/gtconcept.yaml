@@ -1,0 +1,19 @@
+project_name: GTConceptProject
+project_folder: ../../../projects/gt6/gtconcept
+
+base_include_folder: ../../../
+
+output_name: gtconcept
+
+version: 12
+
+files_to_compile:
+  - name: gtconcept.ad
+    is_main: true
+  - name: TopRoot.ad
+  - name: MainMenuRoot.ad
+  - name: CourseLicenseRoot.ad
+  - name: LevelSelectRoot.ad
+  - name: DebugEnemySelectionRoot.ad
+  - name: GameStatusRoot.ad
+  - name: DesignWorkRoot.ad

@@ -1,0 +1,579 @@
+    module EnumCarCategory
+    {
+        static Pacific = 0;
+        static Europe = 1;
+        static Concept = 2;
+        static Dream = 3;
+        static Race = 4;
+    }
+
+    // nil = one-make
+    static gAIGroups = [
+        "vs_hatch": [
+            "demio_glx_99",
+            "fit_w_ff_01",
+            "march_12c_5d_03",
+            "yaris_euro_00",
+            "beetle_20_00"
+        ],
+        "slow": [
+            "yaris_15_16v_00",
+            "lupo_gti_01",
+            "mx5_eu_89",
+            "roadster_89_std",
+            "golf_gti_5dr_01_std"
+        ],
+        "vs_sport": [
+            "mx5_eu_98",
+            "mrs_sedition_99",
+            "delsol_sir_92",
+            "civic_sir2_93",
+            "tuscani_27_01",
+            "mx5_18i_eu_00"
+        ],
+        "s_coupe_sedan": [
+            "tuscani_27_01",
+            "atenza_5hb_01",
+            "primera_20v_01"
+        ],
+        "hatch": [
+            "lupo_gti_01",
+            "pt_cruiser_00",
+            "golf_gti_5dr_01_std",
+            "civic_sir2_93",
+            "will_vs_01",
+            "mini_cooper_s_02",
+            "civic_r_98"
+        ],
+        "hot_hatch": [
+            "mini_cooper_s_02",
+            "civic_r_98",
+            "clio_renaultsport_20_02",
+            "beetle_rsi_00",
+            "civic_r_01"
+        ],
+        "s_sport": [
+            "mx5_18i_eu_00",
+            "s13_ks_88",
+            "celica_ss2_99",
+            "celica_ss2_97",
+            "slk230_komp_98",
+            "opel_speedster_00",
+            "fto_gpr_97"
+        ],
+        "lightweight": [
+            "mx5_eu_98",
+            "mrs_sedition_99",
+            "mx5_18i_eu_00",
+            "opel_speedster_00",
+            "elise_type72_01",
+            "elise2000_00"
+        ],
+        "s_sedan_wagon": [
+            "atenza_5hb_01",
+            "primera_20v_01",
+            "altezza_rs200_98",
+            "lexus_is300_sc_us_01",
+            "accord_euror_00",
+            "skyline_300gt_01",
+            "infiniti_g35_03"
+        ],
+        "sport": [
+            "tt_00",
+            "r32_gtst_m_91",
+            "integra_r_98",
+            "elise_type72_01",
+            "elise2000_00",
+            "rx7_gtx_90_std",
+            "supra_szr_97",
+            "acura_cl_types_01",
+            "integra_r_03",
+            "hcd6_concept_01",
+            "celica_gt_four_98",
+            "s2000_01",
+            "lexus_sc430_eu_01"
+        ],
+        "sedan": [
+            "accord_euror_00",
+            "skyline_300gt_01",
+            "infiniti_g35_03",
+            "s4_98",
+            "legacy_b4_rsk_98",
+            "legacy_b4_blitzen_00",
+            "lancer_evo4_96_std"
+        ],
+        "mh_sport": [
+            "integra_r_03",
+            "celica_gt_four_98",
+            "s2000_01",
+            "lexus_sc430_eu_01",
+            "s15_specr_aero_99",
+            "_300zx_2by2_us_98",
+            "mr2_gts_97",
+            "_300zx_2seat_us_98"
+        ],
+        "super_hot_hatch": [
+            "beetle_rsi_00",
+            "civic_r_01",
+            "clio_sport_v6_00_std",
+            "focus_rs_02"
+        ],
+        "h_sport": [
+            "mr2_gts_97",
+            "_300zx_2seat_us_98",
+            "camaro_z28_coupe_97",
+            "sl500_02",
+            "gto_tt_98",
+            "nsx_s_zero_97",
+            "cl600_00",
+            "rx7_rs_98",
+            "camaro_ss_00"
+        ],
+        "wagon_suv": [
+            "lexus_is300_sc_us_01",
+            "airtrek_turbo_02",
+            "legacy_gtb_96",
+            "rsc_tmv_01",
+            "impreza_wg_wrx_99",
+            "impreza_wg_sti_00",
+            "infiniti_fx45_dmv_02"
+        ],
+        "sporty_sedan": [
+            "lancer_evo4_96_std",
+            "impreza_wrx_sti_00",
+            "impreza_wrx_pro_01",
+            "impreza_wrx_sti6_99",
+            "lancer_evo5_gsr_98"
+        ],
+        "awd_sport": [
+            "gto_tt_98",
+            "impreza_wrx_sti_00",
+            "lancer_evo7_gta_02",
+            "r32_gtr_v2_94_std",
+            "impreza_22b_98",
+            "impreza_wrx_pro_01",
+            "r33_gtr_v_97_std",
+            "impreza_wrx_sti6_99",
+            "lancer_evo5_gsr_98"
+        ],
+        "super_sports": [
+            "rx7_r_br_01",
+            "rx7_spiritr_a_02_std",
+            "clk55_00",
+            "corvette_gs_96",
+            "r34_gtr_v2_00",
+            "_3400s_00",
+            "supra_rz_97",
+            "mustang_svt_cobrar_00",
+            "xkr_coupe_99",
+            "xkr_rperform_02",
+            "elise_190_98"
+        ],
+        "skyline_special": [
+            "r32_gtst_m_91",
+            "r32_gtr_v2_94_std",
+            "r33_gtr_v_97_std",
+            "r34_gtr_m_01"
+        ],
+        "touring_car": [
+            "clio_sport_race_00",
+            "integra_r_lm_01",
+            "atenza_5hb_n1_01"
+        ],
+        "super_wagon": [
+            "impreza_wg_wrx_99",
+            "impreza_wg_sti_00",
+            "rs4_01"
+        ],
+        "wrc_99": [
+            "escort_wrc_98",
+            "impreza_wrc_99",
+            "focus_wrc_99",
+            "evo6_wrc_99",
+            "corolla_wrc_98",
+            "_206_wrc_exxon_99"
+        ],
+        "wrc_01": [
+            "accent_wrc_01",
+            "impreza_wrc_01",
+            "impreza_wrc_prot_01",
+            "cz3_tar_wrc_01"
+        ],
+        "wrc_mix": [
+            "escort_wrc_98",
+            "focus_wrc_99",
+            "evo6_wrc_99",
+            "corolla_wrc_98",
+            "_206_wrc_exxon_99",
+            "accent_wrc_01",
+            "impreza_wrc_01",
+            "cz3_tar_wrc_01"
+        ],
+        "luxury": [
+            "xkr_coupe_99",
+            "s_type_r_02",
+            "db7_vantage_coupe_00",
+            "xkr_rperform_02",
+            "rs6_02"
+        ],
+        "super": [
+            "elise_190_98",
+            "esprit_sport350_00",
+            "r_gt_00",
+            "tuscan_speed6_00_std",
+            "corvette_z06_00",
+            "viper_gts_99",
+            "sl55_amg_02_std"
+        ],
+        "tuned": [
+            "motersport_elise_99",
+            "r_gt_00",
+            "tuscan_speed6_00_std",
+            "mines_evo6_00",
+            "cobra_67_std",
+            "ctr2_96",
+            "mines_r34_00"
+        ],
+        "gt500_00": [
+            "arta_nsx_00",
+            "raybrig_nsx_00",
+            "castrol_supra_00",
+            "calsonic_gtr_00",
+            "loctite_gtr_00"
+        ],
+        "gt500_01": [
+            "mobil_nsx_01",
+            "loctite_nsx_01",
+            "pennzoil_gtr_01",
+            "au_supra_01",
+            "castrol_supra_01",
+            "xanavi_gtr_01"
+        ],
+        "dtm": [
+            "opel_calibra_race_94",
+            "tt_dtm_02",
+            "opel_astra_race_00",
+            "clk_race_00"
+        ],
+        "hyper": [
+            "r390_road_98",
+            "c8_laviolette_02",
+            "cobra_67_std",
+            "ctr2_96",
+            "viper_gtsr_00",
+            "nsx_r_proto_lm_road_01",
+            "ford_gt_concept_dmv_02"
+        ],
+        "gt3": [
+            "corvette_cr5_00",
+            "viper_gtsr_oreca_00",
+            "ford_gt_concept_gulf_02",
+            "gtr_concept_lm_01",
+            "z_tmv_lm_01"
+        ],
+
+        // currently unused
+        "gt300": [
+            "spoon_s2000_race_00",
+            "razo_silvia_01",
+            "mrs_autobacs_00"
+        ]
+    ]
+
+    // AI groups where all AI cars support dirt
+    //   (in a GTC sense, because in GT6 almost all cars do)
+    //
+    // when using a car with an AI group not in this list for a dirt race,
+    //   it will instead create a one-make race, including overriding rival.
+    static gAIGroupsDirt = [
+        "sporty_sedan",
+        "wrc_99",
+        "wrc_01",
+        "wrc_mix"
+    ];
+
+    // car label, category, has dirt tyres, AI group, AI rival
+    static gCarData = [
+        ["ka_01", EnumCarCategory::Pacific, true, nil, nil],
+        ["fit_w_ff_01", EnumCarCategory::Pacific, false, "vs_hatch", "march_12c_5d_03"],
+        ["tuscani_27_01", EnumCarCategory::Pacific, false, "vs_sport", "s13_ks_88"],
+        ["atenza_5hb_01", EnumCarCategory::Pacific, false, "s_coupe_sedan", "primera_20v_01"],
+        ["lexus_is300_sc_us_01", EnumCarCategory::Pacific, false, "s_sedan_wagon", "lexus_is300_sc_us_01"],
+        ["primera_20v_01", EnumCarCategory::Pacific, false, "s_coupe_sedan", "atenza_5hb_01"],
+        ["will_vs_01", EnumCarCategory::Pacific, false, "hatch", "will_vs_01"],
+        ["airtrek_turbo_02", EnumCarCategory::Pacific, true, "s_sedan_wagon", "airtrek_turbo_02"],
+        ["lexus_sc430_eu_01", EnumCarCategory::Pacific, false, "mh_sport", "s2000_01"],
+        ["infiniti_g35_03", EnumCarCategory::Pacific, false, "sedan", "legacy_b4_blitzen_00"],
+        ["skyline_300gt_01", EnumCarCategory::Pacific, false, "sedan", "infiniti_g35_03"],
+        ["civic_r_01", EnumCarCategory::Pacific, false, "hot_hatch", "integra_r_03"],
+        ["integra_r_03", EnumCarCategory::Pacific, false, "sport", "integra_r_98"],
+        ["lancer_evo7_gta_02", EnumCarCategory::Pacific, false, "sporty_sedan", "impreza_wrx_pro_01"],
+        ["s2000_01", EnumCarCategory::Pacific, false, "mh_sport", "lexus_sc430_eu_01"],
+        ["r34_gtr_m_01", EnumCarCategory::Pacific, false, "skyline_special", "r34_gtr_v2_00"],
+        ["impreza_wrx_pro_01", EnumCarCategory::Pacific, true, "sporty_sedan", "lancer_evo6_gsr_99"],
+        ["rx7_spiritr_a_02_std", EnumCarCategory::Pacific, false, "super_sports", "zzs_00"],
+        ["rx7_r_br_01", EnumCarCategory::Pacific, false, "super_sports", "nsx_r_01"],
+        ["corvette_z06_00", EnumCarCategory::Pacific, false, "super", "sl55_amg_02_std"],
+
+        ["golf_gti_5dr_01_std", EnumCarCategory::Europe, true, "slow", "altezza_as200_98"],
+        ["lupo_gti_01", EnumCarCategory::Europe, false, "slow", "pt_cruiser_00"],
+        ["clio_renaultsport_20_02", EnumCarCategory::Europe, true, "hot_hatch", "beetle_rsi_00"],
+        ["sl500_02", EnumCarCategory::Europe, false, "h_sport", "cl600_00"],
+        ["elise2000_00", EnumCarCategory::Europe, false, "lightweight", "supra_szr_97"],
+        ["opel_speedster_00", EnumCarCategory::Europe, false, "s_sport", "elise_type72_01"],
+        ["s_type_r_02", EnumCarCategory::Europe, false, "luxury", "v8_vantage_99"],
+        ["rs4_01", EnumCarCategory::Europe, false, "super_wagon", "lancer_evo7_rs_01"],
+        ["rs6_avant_02", EnumCarCategory::Europe, false, "super_wagon", "rs6_avant_02"],
+        ["vanquish_04", EnumCarCategory::Europe, false, "super", "corvette_z06_00"],
+        ["r_gt_00", EnumCarCategory::Europe, false, "super", "tuscan_speed6_00_std"],
+        ["tuscan_speed6_00_std", EnumCarCategory::Europe, false, "super", "vanquish_04"],
+        ["sl55_amg_02_std", EnumCarCategory::Europe, false, "super", "viper_gts_99"],
+
+        ["march_12c_5d_03", EnumCarCategory::Concept, false, "vs_hatch", "fit_w_ff_01"],
+        ["dome_zero_78", EnumCarCategory::Concept, false, "s_sport", "slk230_komp_98"],
+        ["cz3_tar_tmv_01", EnumCarCategory::Concept, false, "super_hot_hatch", "beetle_rsi_00"],
+        ["_350z_03", EnumCarCategory::Concept, false, "s_sport", "supra_rz_97"],
+        ["garaiya_02", EnumCarCategory::Concept, false, "h_sport", "mr2_gts_97"],
+        ["rx8_tmv_01", EnumCarCategory::Concept, false, "h_sport", "solstice_dmv_02"],
+        ["viper_gtsr_00", EnumCarCategory::Concept, false, "hyper", "ford_gt_concept_dmv_02"],
+
+        ["accent_wrc_01", EnumCarCategory::Race, true, "wrc_01", "impreza_wrc_01"],
+        ["impreza_wrc_99", EnumCarCategory::Race, true, "wrc_99", "evo6_wrc_99"],
+        ["evo6_wrc_99", EnumCarCategory::Race, true, "wrc_99", "impreza_wrc_99"],
+        ["impreza_wrc_01", EnumCarCategory::Race, true, "wrc_01", "cz3_tar_wrc_01"],
+        ["_206_wrc_exxon_99", EnumCarCategory::Race, true, "wrc_99", "focus_wrc_99"],
+        ["loctite_nsx_01", EnumCarCategory::Race, false, "gt500_01", "mobil_nsx_01"],
+        ["arta_nsx_00", EnumCarCategory::Race, false, "gt500_00", "raybrig_nsx_00"],
+        ["raybrig_nsx_00", EnumCarCategory::Race, false, "gt500_00", "castrol_supra_00"],
+        ["calsonic_gtr_00", EnumCarCategory::Race, false, "gt500_00", "arta_nsx_00"],
+        ["xanavi_gtr_01", EnumCarCategory::Race, false, "gt500_01", "au_supra_01"],
+        ["castrol_supra_00", EnumCarCategory::Race, false, "gt500_00", "calsonic_gtr_00"],
+        ["corvette_cr5_00", EnumCarCategory::Race, false, "gt3", "viper_gtsr_oreca_00"],
+
+        ["pennzoil_gtr_01", EnumCarCategory::Race, false, "gt500_01", "xanavi_gtr_01"],
+        ["nsx_r_proto_lm_road_01", EnumCarCategory::Dream, false, "hyper", "xj220_gt_road_92"],
+        ["mini_cooper_s_02", EnumCarCategory::Europe, false, "hatch", "civic_r_98"],
+        ["c8_laviolette_02", EnumCarCategory::Europe, false, "super", "r390_road_98"],
+
+        ["rsc_tmv_01", EnumCarCategory::Concept, true, "wagon_suv", "infiniti_fx45_dmv_02"],
+        ["mm_r_tmv_01", EnumCarCategory::Concept, false, nil, nil],
+        ["castrol_supra_01", EnumCarCategory::Race, false, "gt500_01", "loctite_nsx_01"],
+        ["gtr_concept_tmv_01", EnumCarCategory::Concept, false, "super", "c8_laviolette_02"],
+
+        ["hcd6_concept_01", EnumCarCategory::Concept, false, "sport", "crossfire_04"],
+        ["atenza_5hb_n1_01", EnumCarCategory::Dream, false, "touring_car", "integra_r_lm_01"],
+        ["nsx_r_01", EnumCarCategory::Concept, false, "super_sports", "_350z_03"],
+        ["nsx_r_proto_lm_01", EnumCarCategory::Dream, false, "gt500_01", "rx8_lm_01"],
+
+        ["au_supra_01", EnumCarCategory::Race, false, "gt500_01", "castrol_supra_01"],
+        ["z_tmv_lm_01", EnumCarCategory::Dream, false, "gt3", "z_tmv_lm_01"],
+        ["rs6_02", EnumCarCategory::Europe, false, "luxury", "mines_evo6_00"],
+        ["crossfire_04", EnumCarCategory::Concept, false, "sport", "hcd6_concept_01"],
+
+        ["infiniti_fx45_dmv_02", EnumCarCategory::Concept, true, "wagon_suv", "impreza_wg_sti_00"],
+        ["xkr_rperform_02", EnumCarCategory::Europe, false, "luxury", "rs6_02"],
+        ["mobil_nsx_01", EnumCarCategory::Race, false, "gt500_01", "pennzoil_gtr_01"],
+        ["ford_gt_concept_dmv_02", EnumCarCategory::Concept, false, "hyper", "zonda_c12s_00"],
+
+        ["copen_detachabletop_02", EnumCarCategory::Pacific, false, nil, nil],
+        ["rsc_tmv_lm_01", EnumCarCategory::Concept, true, nil, nil],
+        ["lancer_evo6_gsr_99", EnumCarCategory::Pacific, true, "sporty_sedan", "impreza_wrx_sti6_99"], // toyota pod replacement
+        ["zonda_c12s_gmv_02", EnumCarCategory::Concept, false, "hyper", "zz2_00"],
+
+        ["elise_type72_01", EnumCarCategory::Europe, false, "lightweight", "elise2000_00"],
+        ["integra_r_lm_01", EnumCarCategory::Dream, false, "touring_car", "atenza_5hb_n1_01"],
+        ["focus_rs_02", EnumCarCategory::Europe, true, "super_hot_hatch", "cz3_tar_tmv_01"],
+        ["solstice_dmv_02", EnumCarCategory::Concept, false, "mh_sport", "sl500_02"],
+
+        ["tt_dtm_02", EnumCarCategory::Race, false, "dtm", "clk_race_00"],
+        ["rx8_lm_01", EnumCarCategory::Dream, false, "gt500_01", "nsx_r_proto_lm_01"],
+        ["fairlady_z_aero_02", EnumCarCategory::Concept, false, "h_sport", "spoon_s2000_00"],
+        ["gsx_r_4_tmv_01", EnumCarCategory::Concept, false, "super", "dualnote_tmv_01"],
+
+        ["cien_dmv_02", EnumCarCategory::Concept, false, "hyper", "zonda_c12s_gmv_02"],
+        ["gtr_concept_lm_01", EnumCarCategory::Dream, false, "gt3", "ford_gt_concept_gulf_02"],
+        ["dualnote_tmv_01", EnumCarCategory::Concept, false, "super", "gsx_r_4_tmv_01"],
+        ["cz3_tar_wrc_01", EnumCarCategory::Dream, true, "wrc_mix", "_206_wrc_exxon_99"],
+
+        ["r34_gtr_v_gtcolor_01", EnumCarCategory::Dream, false, "tuned", "mines_r34_00"],
+        ["ford_gt_concept_gulf_02", EnumCarCategory::Dream, false, "gt3", "corvette_cr5_00"],
+        ["clix_concept_01", EnumCarCategory::Concept, false, "awd_sport", "r34_gtr_m_01"],
+        ["w12_tmv_01", EnumCarCategory::Concept, false, "hyper", "cien_dmv_02"],
+
+        // 25% completion
+        ["lupo_gti_cup_03", EnumCarCategory::Race, false, nil, nil],
+
+        // 50% completion
+        ["_147_gta_02", EnumCarCategory::Europe, false, nil, nil],
+
+        // 75% completion
+        ["impreza_wrx_sti_02", EnumCarCategory::Pacific, true, "sporty_sedan", "impreza_wrx_sti_02"],
+
+        // 100% completion
+        ["impreza_wrc_03", EnumCarCategory::Race, true, "wrc_mix", "impreza_wrc_03"],
+
+        // AI ONLY
+        ["demio_glx_99", EnumCarCategory::Pacific, false, nil, nil],
+        ["yaris_euro_00", EnumCarCategory::Pacific, false, nil, nil],
+        ["beetle_20_00", EnumCarCategory::Europe, false, nil, nil],
+        ["yaris_15_16v_00", EnumCarCategory::Pacific, false, nil, nil],
+        ["mx5_eu_89", EnumCarCategory::Pacific, false, nil, nil],
+        ["pt_cruiser_00", EnumCarCategory::Pacific, false, nil, nil],
+        ["roadster_89_std", EnumCarCategory::Pacific, false, nil, nil],
+        ["altezza_as200_98", EnumCarCategory::Pacific, false, nil, nil],
+        ["mx5_eu_98", EnumCarCategory::Pacific, false, nil, nil],
+        ["mrs_sedition_99", EnumCarCategory::Pacific, false, nil, nil],
+        ["delsol_sir_92", EnumCarCategory::Pacific, false, nil, nil],
+        ["civic_sir2_93", EnumCarCategory::Pacific, false, nil, nil],
+        ["mx5_18i_eu_00", EnumCarCategory::Pacific, false, nil, nil],
+        ["civic_r_98", EnumCarCategory::Pacific, false, nil, nil],
+        ["s13_ks_88", EnumCarCategory::Pacific, false, nil, nil],
+        ["celica_ss2_99", EnumCarCategory::Pacific, false, nil, nil],
+        ["altezza_rs200_98", EnumCarCategory::Pacific, false, nil, nil],
+        ["celica_ss2_97", EnumCarCategory::Pacific, false, nil, nil],
+        ["slk230_komp_98", EnumCarCategory::Europe, false, nil, nil],
+        ["fto_gpr_97", EnumCarCategory::Pacific, false, nil, nil],
+        ["beetle_rsi_00", EnumCarCategory::Europe, false, nil, nil],
+        ["accord_euror_00", EnumCarCategory::Pacific, false, nil, nil],
+        ["tt_00", EnumCarCategory::Europe, false, nil, nil],
+        ["r32_gtst_m_91", EnumCarCategory::Pacific, false, nil, nil],
+        ["integra_r_98", EnumCarCategory::Pacific, false, nil, nil],
+        ["rx7_gtx_90_std", EnumCarCategory::Pacific, false, nil, nil],
+        ["supra_szr_97", EnumCarCategory::Pacific, false, nil, nil],
+        ["acura_cl_types_01", EnumCarCategory::Pacific, false, nil, nil],
+        ["celica_gt_four_98", EnumCarCategory::Pacific, false, nil, nil],
+        ["clio_sport_v6_00_std", EnumCarCategory::Europe, false, nil, nil],
+        ["s4_98", EnumCarCategory::Europe, false, nil, nil],
+        ["s15_specr_aero_99", EnumCarCategory::Pacific, false, nil, nil],
+        ["_300zx_2by2_us_98", EnumCarCategory::Pacific, false, nil, nil],
+        ["legacy_b4_rsk_98", EnumCarCategory::Pacific, false, nil, nil],
+        ["legacy_gtb_96", EnumCarCategory::Pacific, false, nil, nil],
+        ["mr2_gts_97", EnumCarCategory::Pacific, false, nil, nil],
+        ["_300zx_2seat_us_98", EnumCarCategory::Pacific, false, nil, nil],
+        ["legacy_b4_blitzen_00", EnumCarCategory::Pacific, false, nil, nil],
+        ["lancer_evo4_96_std", EnumCarCategory::Pacific, false, nil, nil],
+        ["camaro_z28_coupe_97", EnumCarCategory::Pacific, false, nil, nil],
+        ["spoon_s2000_00", EnumCarCategory::Pacific, false, nil, nil],
+        ["impreza_wg_wrx_99", EnumCarCategory::Pacific, false, nil, nil],
+        ["gto_tt_98", EnumCarCategory::Pacific, false, nil, nil],
+        ["impreza_wrx_sti_00", EnumCarCategory::Pacific, false, nil, nil],
+        ["impreza_wg_sti_00", EnumCarCategory::Pacific, false, nil, nil],
+        ["nsx_s_zero_97", EnumCarCategory::Pacific, false, nil, nil],
+        ["cl600_00", EnumCarCategory::Europe, false, nil, nil],
+        ["r32_gtr_v2_94_std", EnumCarCategory::Pacific, false, nil, nil],
+        ["impreza_22b_98", EnumCarCategory::Pacific, false, nil, nil],
+        ["r33_gtr_v_97_std", EnumCarCategory::Pacific, false, nil, nil],
+        ["impreza_wrx_sti6_99", EnumCarCategory::Pacific, false, nil, nil],
+        ["rx7_rs_98", EnumCarCategory::Pacific, false, nil, nil],
+        ["camaro_ss_00", EnumCarCategory::Pacific, false, nil, nil],
+        ["lancer_evo5_gsr_98", EnumCarCategory::Pacific, false, nil, nil],
+        ["clio_sport_race_00", EnumCarCategory::Europe, false, nil, nil],
+        ["clk55_00", EnumCarCategory::Europe, false, nil, nil],
+        ["lancer_evo7_gsr_01", EnumCarCategory::Pacific, false, nil, nil],
+        ["corvette_gs_96", EnumCarCategory::Pacific, false, nil, nil],
+        ["r34_gtr_v2_00", EnumCarCategory::Pacific, false, nil, nil],
+        ["_3400s_00", EnumCarCategory::Europe, false, nil, nil],
+        ["supra_rz_97", EnumCarCategory::Pacific, false, nil, nil],
+        ["lancer_evo7_rs_01", EnumCarCategory::Pacific, false, nil, nil],
+        ["escort_wrc_98", EnumCarCategory::Race, false, nil, nil],
+        ["motersport_elise_99", EnumCarCategory::Europe, false, nil, nil],
+        ["zzs_00", EnumCarCategory::Pacific, false, nil, nil],
+        ["mustang_svt_cobrar_00", EnumCarCategory::Pacific, false, nil, nil],
+        ["xkr_coupe_99", EnumCarCategory::Europe, false, nil, nil],
+        ["focus_wrc_99", EnumCarCategory::Race, false, nil, nil],
+        ["impreza_wrc_prot_01", EnumCarCategory::Race, false, nil, nil],
+        ["corolla_wrc_98", EnumCarCategory::Race, false, nil, nil],
+        ["db7_vantage_coupe_00", EnumCarCategory::Europe, false, nil, nil],
+        ["spoon_s2000_race_00", EnumCarCategory::Pacific, false, nil, nil],
+        ["elise_190_98", EnumCarCategory::Europe, false, nil, nil],
+        ["razo_silvia_01", EnumCarCategory::Race, false, nil, nil],
+        ["esprit_sport350_00", EnumCarCategory::Europe, false, nil, nil],
+        ["mrs_autobacs_00", EnumCarCategory::Race, false, nil, nil],
+        ["v8_vantage_99", EnumCarCategory::Europe, false, nil, nil],
+        ["viper_gts_99", EnumCarCategory::Pacific, false, nil, nil],
+        ["mines_evo6_00", EnumCarCategory::Pacific, false, nil, nil],
+        ["r390_road_98", EnumCarCategory::Concept, false, nil, nil],
+        ["opel_calibra_race_94", EnumCarCategory::Race, false, nil, nil],
+        ["cobra_67_std", EnumCarCategory::Pacific, false, nil, nil],
+        ["ctr2_96", EnumCarCategory::Europe, false, nil, nil],
+        ["mines_r34_00", EnumCarCategory::Pacific, false, nil, nil],
+        ["xj220_gt_road_92", EnumCarCategory::Europe, false, nil, nil],
+        ["opel_astra_race_00", EnumCarCategory::Race, false, nil, nil],
+        ["zonda_c12s_00", EnumCarCategory::Europe, false, nil, nil],
+        ["clk_race_00", EnumCarCategory::Race, false, nil, nil],
+        ["loctite_gtr_00", EnumCarCategory::Race, false, nil, nil],
+        ["zz2_00", EnumCarCategory::Pacific, false, nil, nil],
+        ["viper_gtsr_oreca_00", EnumCarCategory::Race, false, nil, nil]
+    ];
+
+    static gCarUnlockData = [
+        "start": [
+             "ka_01",
+             "fit_w_ff_01",
+             "tuscani_27_01",
+             "atenza_5hb_01",
+             "lexus_is300_sc_us_01",
+             "primera_20v_01",
+             "will_vs_01",
+             "airtrek_turbo_02",
+             "lexus_sc430_eu_01",
+             "infiniti_g35_03",
+             "skyline_300gt_01",
+             "civic_r_01",
+             "integra_r_03",
+             "lancer_evo7_gta_02",
+             "s2000_01",
+             "r34_gtr_m_01",
+             "impreza_wrx_pro_01",
+             "rx7_spiritr_a_02_std",
+             "rx7_r_br_01",
+             "corvette_z06_00",
+
+             "golf_gti_5dr_01_std",
+             "lupo_gti_01",
+             "clio_renaultsport_20_02",
+             "sl500_02",
+             "elise2000_00",
+             "opel_speedster_00",
+             "s_type_r_02",
+             "rs4_01",
+             "rs6_avant_02",
+             "vanquish_04",
+             "r_gt_00",
+             "tuscan_speed6_00_std",
+             "sl55_amg_02_std",
+
+             "march_12c_5d_03"
+             "dome_zero_78",
+             "cz3_tar_tmv_01",
+             "_350z_03",
+             "garaiya_02",
+             "rx8_tmv_01",
+             "viper_gtsr_00",
+
+             "accent_wrc_01",
+             "impreza_wrc_99",
+             "evo6_wrc_99",
+             "impreza_wrc_01",
+             "_206_wrc_exxon_99",
+             "loctite_nsx_01",
+             "arta_nsx_00",
+             "raybrig_nsx_00",
+             "calsonic_gtr_00",
+             "xanavi_gtr_01",
+             "castrol_supra_00",
+             "corvette_cr5_00"
+        ],
+        // license bronze, license gold, easy race, medium race
+        "midfield": [ "pennzoil_gtr_01", "nsx_r_proto_lm_road_01", "mini_cooper_s_02", "c8_laviolette_02" ],
+        "r_midfield": [ "rsc_tmv_01", "mm_r_tmv_01",  "castrol_supra_01", "gtr_concept_tmv_01" ],
+        "akasaka": [ "hcd6_concept_01", "atenza_5hb_n1_01", "nsx_r_01", "nsx_r_proto_lm_01" ],
+        "r_akasaka": [ "au_supra_01", "z_tmv_lm_01", "rs6_02", "crossfire_04" ],
+        "toscana": [ "infiniti_fx45_dmv_02", "xkr_rperform_02", "mobil_nsx_01", "ford_gt_concept_dmv_02" ],
+        "r_toscana": [ "copen_detachabletop_02", "rsc_tmv_lm_01", "lancer_evo6_gsr_99", "zonda_c12s_gmv_02" ],
+        "eiger_dirt_east": [ "elise_type72_01", "integra_r_lm_01", "focus_rs_02", "solstice_dmv_02" ],
+        "r_eiger_dirt_east": [ "tt_dtm_02", "rx8_lm_01", "fairlady_z_aero_02", "gsx_r_4_tmv_01" ],
+        "autumn": [ "cien_dmv_02", "gtr_concept_lm_01", "dualnote_tmv_01", "cz3_tar_wrc_01" ],
+        "r_autumn": [ "r34_gtr_v_gtcolor_01", "ford_gt_concept_gulf_02", "clix_concept_01", "w12_tmv_01" ],
+        "bonus": [ "lupo_gti_cup_03", "_147_gta_02", "impreza_wrx_sti_02", "impreza_wrc_03" ]
+    ];
