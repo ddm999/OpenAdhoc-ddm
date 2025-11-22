@@ -2516,9 +2516,9 @@ module GTModeRoot
                     self.max_new_date_sec = 0L;
                     self.New.visible = false;
 
+                    var me = self;
                     if (LoginUtil::isOnline())
                     {
-                        var me = self;
                         Grim2.requestUsedCarList(function(args) 
                         {
                             |var context, var request| = args;
@@ -2526,7 +2526,7 @@ module GTModeRoot
                             {
                                 var used_car_list = Grim2.decodeUsedCarList(request);
                                 var new_date = used_car_list["new_date"];
-                                
+
                                 var new_date_sec = new_date.getBySecond();
                                 if (me != nil && me.max_new_date_sec != nil)
                                 {
@@ -2541,14 +2541,18 @@ module GTModeRoot
                             }
                         });
                     }
+                    else
+                    {
+                        //TODO: can't figure out how to calculate whether it should show NEW :(
+                    }
 
                     return EVENTRESULT_FILTER;
                 }
 
                 method onActivate(context)
                 {
-                    CHECK_ONLINE_GRANDTOP();
-                    CHECK_ONLINE_PROMPT();
+                    //CHECK_ONLINE_GRANDTOP();
+                    //CHECK_ONLINE_PROMPT();
 
                     main::sound.play("ok");
                     PROJECT.history['GTModeRoot::FocusWidgetName'] = self.getNodePath(PROJECT::ROOT);
