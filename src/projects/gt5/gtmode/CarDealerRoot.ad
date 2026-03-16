@@ -4,6 +4,7 @@ module ROOT
 
     static sDealerList
     static sCaptureMode
+    static sShowAllCars
 
     method open(context)
     {
@@ -22,6 +23,8 @@ module ROOT
     method onInitialize(context)
     {
         sCaptureMode = false;
+        sShowAllCars = false;
+        sProcessedCars = false;
 
         self.ButtonHelpGT5.set(context, 
         [
@@ -245,7 +248,8 @@ module ROOT::DealerSelect
         ROOT.ButtonHelpGT5.set(context, 
         [
             [ButtonHelpGT5.getEnterButtonName(), context.translate(ROOT, "Component", "Enter")],
-            [ButtonHelpGT5.getCancelButtonName(), context.translate(ROOT, "Component", "Cancel")]
+            [ButtonHelpGT5.getCancelButtonName(), context.translate(ROOT, "Component", "Cancel")],
+            ["Triangle", sShowAllCars == false ? "Toggle All Cars" : "Toggle Premium Cars"], // toggle Standard cars
         ]);
 
         ROOT::veil::FadeActor.reverse = false;
@@ -327,6 +331,23 @@ module ROOT::DealerSelect
         }
     }
 
+    method onKeyPress(context, event)
+    {
+        if (event.keysym == CELL_PAD_CTRL_TRIANGLE)
+        {
+            ROOT.setFocus(nil);
+            sShowAllCars = !sShowAllCars;
+            ROOT.ButtonHelpGT5.set(context, 
+            [
+                [ButtonHelpGT5.getEnterButtonName(), context.translate(ROOT, "Component", "Enter")],
+                [ButtonHelpGT5.getCancelButtonName(), context.translate(ROOT, "Component", "Cancel")],
+                ["Triangle", sShowAllCars == false ? "Toggle All Cars" : "Toggle Premium Cars"], // toggle Standard cars
+            ]);
+            main::sound.play("tab_switch");
+            ROOT.setFocus(ROOT::DealerSelect);
+        }
+    }
+
     method cb_init_dealer(context, candidate_data, item_w, arg)
     {
         var tuner_label = candidate_data.value_;
@@ -349,7 +370,11 @@ module ROOT::DealerSelect
         var search_level = (a_level > b_level) ? a_level : b_level;
 
         var ignore_carlist = [];
-        var tuner_cars = CarData::CarDealerGT5::getCarList(tuner_label);
+        var tuner_cars = [];
+        if (sShowAllCars)
+            tuner_cars = CarData::getCarList(tuner_label);
+        else
+            tuner_cars = CarData::CarDealerGT5::getCarList(tuner_label);
 
         foreach (var car in tuner_cars)
         {
@@ -495,7 +520,7 @@ module ROOT::DealerSelect
             return EVENTRESULT_STOP;
         }
     }
- }
+}
 
 module ROOT::CarSelect
 {
@@ -835,7 +860,11 @@ module ROOT::CarSelect
 
     method makeInitialData(context, tuner_label)
     {
-        var cpp_list = CarData::CarDealerGT5::getCarList(tuner_label);
+        var cpp_list = [];
+        if (sShowAllCars)
+            cpp_list = CarData::getCarList(tuner_label);
+        else
+            cpp_list = CarData::CarDealerGT5::getCarList(tuner_label);
         var candidates = [];
 
         foreach (var cpp in cpp_list)
