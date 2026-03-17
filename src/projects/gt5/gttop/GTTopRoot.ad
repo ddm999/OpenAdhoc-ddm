@@ -992,6 +992,7 @@ module GTTopRoot
         }
         else if (event.keysym == CELL_PAD_CTRL_START)
         {
+            LeaveDetectUtil::suspend(context);
             var message = "Thanks for playing this mod!\n"
                           "If you have an interest in modding or would like to know more, feel free to join on the GT modding community discord!\n"
                           "https://nenkai.github.io/gt-modding-hub/\n"
@@ -1021,8 +1022,9 @@ module GTTopRoot
                           "\n"
                           "You, for playing this! :D\n";
 
-            DialogUtil::openInformationDialog(context, 
+            DialogUtil::openInformationDialog(context,
                 message, "Gran Turismo 5 Master Mod");
+            LeaveDetectUtil::resume(context);
         }
 
         return EVENTRESULT_CONTINUE;
@@ -1779,7 +1781,9 @@ module GTTopRoot::PopupNews
 
                 if (!LoginUtil::isOnline())
                 {
+                    LeaveDetectUtil::suspend(context);
                     DialogUtil::openConfirmDialog(context, DialogUtil::ERROR, context.translate(ROOT, "Network", "CANNOT_CONNECT_SERVER"));
+                    LeaveDetectUtil::resume(context);
 
                     return EVENTRESULT_FILTER;
                 }
@@ -1833,6 +1837,8 @@ module GTTopRoot::hidden
 
             if (!LoginUtil::isOnline())
             {
+                LeaveDetectUtil::suspend(context);
+
                 if (self.news["comment"] != nil)
                 {
                     DialogUtil::openInformationDialog(context, self.news["comment"], self.news["title"]);
@@ -1846,6 +1852,7 @@ module GTTopRoot::hidden
                     ROOT.setFocus(Menus::MainMenu::ListBox);
                 }
 
+                LeaveDetectUtil::resume(context);
                 return EVENTRESULT_FILTER;
             }
 
