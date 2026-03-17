@@ -792,6 +792,17 @@ module ROOT::CarSelect
         self.Info::Price.set(price, true);
         self.Info::SpecialLogo.set(cpp.car_code);
         self.Info::PP.set(cpp.getCP());
+
+        if (!sShowAllCars)
+        {
+            self.Info::premium.visible = false;
+            self.Info::standard.visible = false;
+        }
+        else
+        {
+            self.Info::premium.visible = cpp.has_premium;
+            self.Info::standard.visible = !cpp.has_premium;
+        }
     }
 
     method onChangeCar(context, ct)
