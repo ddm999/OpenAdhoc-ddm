@@ -37,7 +37,8 @@ module ROOT
             self.U.visible = false;
             self.H.visible = true;
 
-            var text = context.translate(ROOT, "GTModeProject::GTModeRoot", "LABEL_ONLINEUSEDCARDEALER").split("\n").join(" ");
+            var label_key = LoginUtil::isOnline() ? "LABEL_ONLINEUSEDCARDEALER" : "LABEL_SPECIALUSEDCARDEALER";
+            var text = context.translate(ROOT, "GTModeProject::GTModeRoot", label_key).split("\n").join(" ");
 
             self.title.text = text.upcase();
             CarSelect.sort_order.visible = false;

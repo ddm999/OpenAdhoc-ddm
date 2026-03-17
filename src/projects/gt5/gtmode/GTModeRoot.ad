@@ -2524,6 +2524,9 @@ module GTModeRoot
                     self.max_new_date_sec = 0L;
                     self.New.visible = false;
 
+                    self.TextFace.text = context.translate(ROOT, "GTModeProject::GTModeRoot",
+                        LoginUtil::isOnline() ? "LABEL_ONLINEUSEDCARDEALER" : "LABEL_SPECIALUSEDCARDEALER");
+
                     var me = self;
                     if (LoginUtil::isOnline())
                     {
