@@ -1230,6 +1230,14 @@ module GTModeRoot
         {
             module News
             {
+                method onInitialize(context)
+                {
+                    var online = LoginUtil::isOnline();
+                    self.insensitive = !online;
+                    self.ColorFace.visible = online;
+                    self.ImageFace.visible = online;
+                }
+
                 method onActivate(context)
                 {
                     CHECK_NOT_DEMO();
