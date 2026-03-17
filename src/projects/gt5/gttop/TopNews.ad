@@ -49,6 +49,8 @@ module News
         {
             var article = articles[i];
             var cat_id1 = article.getAttribute("category_id1").toInt();
+            if (cat_id1 == 20)
+                continue;
             var cat_name = "";
             if (categories != nil)
             {
