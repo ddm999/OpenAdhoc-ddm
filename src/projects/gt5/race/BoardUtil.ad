@@ -157,7 +157,6 @@ module BoardUtil
         var hasFinished = false;
         var all = sEntryNum - 1;
         var loaded1 = ORG.getLoadedCarCount();
-        var loaded2 = -1;
 
         while (!hasFinished)
         {
@@ -165,12 +164,12 @@ module BoardUtil
 
             if (sBoardList == nil)
                 break;
-                
+
             var cnt = ORG.getLoadedCarCount();
-            if (cnt == loaded2)
+            // master mod modified check: previous check would break if no car was loaded in 200ms
+            if (cnt == -1)
                 break;
 
-            var loaded2 = cnt;
             if (cnt != loaded1)
             {
                 loaded1 = cnt;
