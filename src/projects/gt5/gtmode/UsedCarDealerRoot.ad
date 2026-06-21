@@ -295,7 +295,7 @@ module ROOT
             var node = nodelist[0];
             usedcar_version = node.getAttribute("version").toInt();
             usedcar_title = node.getAttribute("title");
-            var nodelist = node["car"];
+            nodelist = node["car"];
             if (nodelist == nil)
                 return [];
 
