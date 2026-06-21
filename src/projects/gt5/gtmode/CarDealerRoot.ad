@@ -628,6 +628,7 @@ module ROOT::CarSelect
         self.Info::SpecialLogo.reset();
         self.Info::Price.set(0, true);
         self.Info::PP.reset();
+        self.Info::racingmodification.visible = false;
 
         if (!warp)
         {
@@ -712,6 +713,7 @@ module ROOT::CarSelect
         self.Info::SpecialLogo.reset();
         self.Info::Price.set(0, true);
         self.Info::PP.reset();
+        self.Info::racingmodification.visible = false;
         self.Description.hide(true);
         self.hide(context, true);
     }
@@ -803,6 +805,9 @@ module ROOT::CarSelect
             self.Info::premium.visible = cpp.has_premium;
             self.Info::standard.visible = !cpp.has_premium;
         }
+
+        var cp = main::gtengine::MCarParameter(cpp.car_code);
+        self.Info::racingmodification.visible = cp.getRacingModifyCode() != nil;
     }
 
     method onChangeCar(context, ct)
@@ -817,6 +822,7 @@ module ROOT::CarSelect
     {
         self.Info::Spec.reset();
         self.Info::CarNameCountryFlag::car_name.text = "";
+        self.Info::racingmodification.visible = false;
     }
 
     method cb_selected_car(context, folder_data, close, arg)
