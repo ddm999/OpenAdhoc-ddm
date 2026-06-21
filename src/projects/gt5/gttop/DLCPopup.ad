@@ -172,13 +172,16 @@ module DLCPopup
     method onInitialize(context)
     {
         self.invisible_pages = [];
-        var page_list = context.getPageList();
-        foreach (var page in page_list)
+
         {
-            if (self != page && page.visible)
+            var page_list = context.getPageList();
+            foreach (var page in page_list)
             {
-                page.visible = false;
-                self.invisible_pages.push(page);
+                if (self != page && page.visible)
+                {
+                    page.visible = false;
+                    self.invisible_pages.push(page);
+                }
             }
         }
 
@@ -291,7 +294,9 @@ module DLCPopup
             remaining_count = 1;
         }
         else
-            ;
+        {
+
+        }
 
         self.remaining_count_map[type] = remaining_count;
     }
@@ -341,7 +346,9 @@ module DLCPopup
             self.remaining_count_map[type] = 1;
         }
         else
-            ;
+        {
+
+        }
     }
 
     method updateStatus(context)
@@ -540,20 +547,26 @@ module DLCPopup
                         break;
 
                     case DLCUtil::TYPE::WEAR_001:
-                        result = installWear(context, item.data);
-                        icon_path = "piece/itemcategory/info_special_wear_set.img";
+                        {
+                            result = installWear(context, item.data);
+                            icon_path = "piece/itemcategory/info_special_wear_set.img";
+                        }
                         break;
 
                     case DLCUtil::TYPE::PAINT_001:
-                        result = installPaint(context, item.data);
-                        icon_path = "piece/itemcategory/info_color_paint.img";
+                        {
+                            result = installPaint(context, item.data);
+                            icon_path = "piece/itemcategory/info_color_paint.img";
+                        }
                         break;
 
                     case DLCUtil::TYPE::COURSE_001:
                     case DLCUtil::TYPE::COURSE_002:
                     case DLCUtil::TYPE::COURSE_003:
-                        result = installCourse(context, item.data);
-                        icon_path = "piece/itemcategory/info_event.img";
+                        {
+                            result = installCourse(context, item.data);
+                            icon_path = "piece/itemcategory/info_event.img";
+                        }
                         break;
 
                     default:
@@ -570,7 +583,9 @@ module DLCPopup
                     item.updateStatus(context, item.data.can_install);
                 }
                 else
-                    ;
+                {
+                    
+                }
 
                 return EVENTRESULT_FILTER;
             }

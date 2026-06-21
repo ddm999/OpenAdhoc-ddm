@@ -1,5 +1,11 @@
 
 # OpenAdhoc
+
+> **Minimum required GTAdhocToolchain version: [1.4.0](https://github.com/Nenkai/GTAdhocToolchain/releases/tag/1.4.0)**
+
+> [!WARNING]
+> **NOTE: AS OF 1.4.0**, please rebase your work on the latest OpenAdhoc. Major compiler accuracy fixes have been made that required the current source to be altered.
+
 OpenAdhoc is an open-source re-implementation of the proprietary "Adhoc" scripting language used in Gran Turismo games. OpenAdhoc allows logic-based modding as seen on the [GT6 Spec II Mod](https://www.gtplanet.net/forum/threads/beta6-gt6-spec-ii-mod.399796/) and [GT4 Randomizer/Spec II](https://twitter.com/TheAdmiester/status/1658179881186779144), among other fan projects currently in development.
 
 This repository contains compilable game scripts re-created from originally compiled ones. This allows source-code level editing for scripts that have been successfully reverse-engineered in Adhoc-based GT games.<br>
@@ -933,7 +939,7 @@ Out of scope. GT7 no longer uses Adhoc language and instead uses Swift (custom p
 
 ## ⚙️ Compilation
 
-[Adhoc Toolchain](https://github.com/Nenkai/GTAdhocToolchain) **version 1.3.5** is required to compile game scripts. 
+[Adhoc Toolchain](https://github.com/Nenkai/GTAdhocToolchain) **version 1.4.0** is required to compile game scripts. 
 The tool itself is command line-based without a native GUI, however it does have a VS Code Extension, and a Python GUI wrapper for streamlined usage / workflow.
 > [!TIP]
 Adhoc Toolchain (i.e `adhoc.exe`) can be added to your **PATH** (Optional)
@@ -962,8 +968,7 @@ For more details refer to the [Adhoc Page](https://nenkai.github.io/gt-modding-h
 * Play around with adhoc first. [Learn the basics](https://nenkai.github.io/gt-modding-hub/concepts/adhoc/adhoc), [the language](https://nenkai.github.io/gt-modding-hub/concepts/adhoc/language/), [and more](https://github.com/Nenkai/GTAdhocToolchain/wiki). Compile basic code, investigate the disassembly, [optionally have GT6 run your code using TinyWeb, through RPCS3](https://nenkai.github.io/gt-modding-hub/concepts/adhoc/tinyweb/)
 * Refer to the repository for examples of matching code.
 * Translating by hand is a time-consuming and a somewhat steep process, but it is still far easier than decompiling matching assembly language.
-* **Once you understand Adhoc well to the point where you know the bytecode, can reverse projects manually yourself and know general compilation process inside-out**, you may train an AI model to translate the disassembly for you by having it help you edit code that's already translated,
-and attempt to have it decompile disassembly every so often. The key to training it is providing a lot of adhoc source code, and over many separate chats over time. It needs to learn the format of adhoc much moreso than the disassembly. This can take a very long time before it gets any good, but if it does it can make short work of even the largest scripts.<br>
+<br>
 <details>
   <summary> 📝 Translation example (Expand to view)</summary>
 
