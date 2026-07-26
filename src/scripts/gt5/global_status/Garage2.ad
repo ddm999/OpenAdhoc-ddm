@@ -61,7 +61,7 @@ module Garage2
             self.grim_car_id = grim_car_id;
             self.pp = pp;
             self.favorite = favorite;
-            self.invalid = invalid;
+            self.invalid = false; //mm hack: remove invalid flag for cars which gets added by an engine-level save check (?)
         }
 
         method copyIf(_cpp)
