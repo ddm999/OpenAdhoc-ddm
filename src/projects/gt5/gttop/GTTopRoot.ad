@@ -430,6 +430,7 @@ module GTTopRoot
         }
 
         var dp = GAME_STATUS.user_profile.residence.getPlayer(0);
+        Upper::debug.text = "scene: %s / cp: %s".format(scene_alias, cp.getCarLabel());
         SceneFaceUtil::loadScene(SceneFace, scene_alias, cp, dp, false);
 
         if (scene_alias == "color_select")

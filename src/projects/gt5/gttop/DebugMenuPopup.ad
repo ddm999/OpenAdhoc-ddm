@@ -115,6 +115,51 @@ module DebugMenuPopup
         ROOT::Template::ScrolledWindow::clip::space::Magazine::Check.active = GAME_STATUS.entitlement.has(gtengine::EntitlementType::EVENT, "201102magazine");
         ROOT::Template::ScrolledWindow::clip::space::GTAcademyEdition::Check.active = GAME_STATUS.entitlement.has(gtengine::EntitlementType::EVENT, "gtacademy2012");
         ROOT::Template::ScrolledWindow::clip::space::RedBull5G::Check.active = GAME_STATUS.entitlement.has(gtengine::EntitlementType::EVENT, "redbull5g");
+
+        // top scene debug list
+        var scenes_list = [
+            "top_redbullhangar7",
+            "top_shirakawa",
+            "top_GTR_engine",
+            "photo_galgano",
+            "top_ahrweiler01",
+            "top_DarkHangar01",
+            "top_new_nur",
+            "top_DarkSmoke_01",
+            "top_new_bonn",
+            "top_kiritooshi_new",
+            "top_whiteTown",
+            "top_ahrweiler02",
+            "top_ahrweiler03",
+            "top_shorenin",
+            "top_bern",
+            "photo_luzern",
+            "top_campo",
+            "top_sangimi",
+            "tourDeItalia_bern",
+            "tourDeItalia_Luzern",
+            "tourDeItalia_Siena",
+            "tourDeItalia_Sangimi",
+            "tourDeItalia_galgano",
+            "X-1challenge_intro",
+            "NASCAR_school_intro",
+            "loeb_Rally_Challenge",
+            "Topgear_intro",
+            "X1_delivery",
+            "top_garage",
+            "allavt_topdemo",
+            "grandtop_intro"
+        ];
+        for (var i = 0; i < scenes_list.size; i++)
+        {
+            var item = hidden::Item.doCopy();
+            item["label"].text = scenes_list[i];
+            item["label"].adjustScale();
+
+            var vbox = Template::ScrolledWindow::clip::space::TopSceneDebug::OptionMenu::popup::vbox;
+            vbox.appendChild(context, item);
+        }
+        Template::ScrolledWindow::clip::space::TopSceneDebug::OptionMenu.applyAppend(context);
     }
 
     method apply(context)
@@ -1662,19 +1707,22 @@ module DebugMenuPopup::Template::ScrolledWindow::clip::space::GTAcademyEdition::
     }
 }
 
-module DebugMenuPopup::Template::ScrolledWindow::clip::space::TopSceneDebug
+module DebugMenuPopup::Template::ScrolledWindow::clip::space::TopSceneDebug::Exec
 {
     method onActivate(context)
     {
         if (!DialogUtil::openConfirmDialog(context, DialogUtil::YESNO, "Master Mod Note\n
-            This was a debug option used to only allow ONE scene to display in the main menu. Not recommended.\n
-            To revert this, use \"Add All Scenes to top Screen\". Continue?"))
+            This debug option allows only ONE specified scene to display in the main menu. Not recommended.\n
+            To revert this, use \"Add All Scenes to Top Screen\". Continue?"))
             return EVENTRESULT_FILTER;
 
         PleaseWait.begin(context);
 
+        var focused_item = Template::ScrolledWindow::clip::space::TopSceneDebug::OptionMenu.getItem();
+        var next_scene = focused_item.label.text;
+
         GAME_STATUS.user_profile.game_flags.top_scenes = 0;
-        GAME_STATUS.user_profile.game_flags.setFlag("TOP_SCENES", "allavt_topdemo", true);
+        GAME_STATUS.user_profile.game_flags.setFlag("TOP_SCENES", next_scene, true);
 
         PleaseWait.end(context);
 
