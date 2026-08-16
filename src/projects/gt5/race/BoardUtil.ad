@@ -163,13 +163,13 @@ module BoardUtil
             Thread::Sleep(0.1);
 
             if (sBoardList == nil)
-                continue;
+                break;
                 
             var cnt = ORG.getLoadedCarCount();
-            if (cnt == loaded2)
-                continue;
+            // master mod modified check: previous check would break if no car was loaded in 200ms
+            if (cnt == -1)
+                break;
 
-            loaded2 = cnt;
             if (cnt != loaded1)
             {
                 loaded1 = cnt;
