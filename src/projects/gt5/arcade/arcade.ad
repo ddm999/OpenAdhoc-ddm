@@ -39,6 +39,7 @@ module PROJECT
     static gAbortSequence = false;
     static gLeaveDetectTime;
     static gDrivingOption;
+    static gForceWeather = false;
 
 
     module ArcadeModeEnum
@@ -1176,7 +1177,7 @@ module PROJECT
             var rp = gp.event.race_parameter;
             
 
-            if (course_parameter.weather_changeable_)
+            if (course_parameter.weather_changeable_ || gForceWeather)
             {
                 rp.decisive_weather = gtengine::DecisiveWeather::NONE;
             

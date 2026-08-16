@@ -33,6 +33,7 @@ module OverLapRoot
         OverLapRoot::ButtonHelpGT5.set(context,
             [[ButtonHelpGT5.getEnterButtonName(), context.translate(OverLapRoot, "BUTTON_OK")], 
              ["Triangle", "Toggle Premium/Standard"], // toggle PS2 course button
+             ["Square", "Toggle Forced Weather"], // toggle weather force button
              [ButtonHelpGT5.getCancelButtonName(), context.translate(OverLapRoot, "BUTTON_BACK")]]);
     }
 
