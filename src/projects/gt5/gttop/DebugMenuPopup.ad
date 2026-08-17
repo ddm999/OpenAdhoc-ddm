@@ -148,7 +148,22 @@ module DebugMenuPopup
             "X1_delivery",
             "top_garage",
             "allavt_topdemo",
-            "grandtop_intro"
+            "grandtop_intro",
+            "menu_lemans2010", // le mans, peugeot 908 hdi fap
+            "photo_ahrweiler1_winter", // snowing & christmas decorations
+            "autodemo", // dealership car detail
+            "avatart_paper_doll", // basic avatar rotating
+            "car_dealer", // old dealership background
+            "garage", // old garage background, rotating car offset left
+            "GT_AUTO_entrance", // gt auto guy stood infront of car, no background
+            "tourDeItalia_roma_gold", // grand tour ending with gold trophy
+            "top_GTA_2012", // GTA Academy cars overview, very dark
+            "menu_online", // online menu, globe with lines
+            "menu_online_ranking", // online menu, lines but no globe
+            "menu_dealer_top", // dealership background
+            "menu_car_select", // very zoomed car
+            "license_congrats", // people walk in and through your car, default camera
+            "license_congrats_2012gtacademy", // same as license_congrats but the guys are GTA branded
         ];
         for (var i = 0; i < scenes_list.size; i++)
         {
@@ -1198,13 +1213,18 @@ module DebugMenuPopup::Template::ScrolledWindow::clip::space::AllTopSceneAvailab
 {
     method onActivate(context)
     {
+        var res = DialogUtil::openConfirmDialog(context, DialogUtil::YESNOCLOSE, "Master Mod Note\n
+            This debug option sets what scenes can display in the main menu.\n
+            Hit 'OK' for all unlockable scenes, 'Cancel' for only initial save scenes, or 'Close' to cancel.")
+        if (res == DialogUtil::RESULT_CLOSE)
+            return EVENTRESULT_FILTER;
+
         PleaseWait.begin(context);
 
-        var flags = [
+        var default_flags = [
             "top_redbullhangar7",
             "top_shirakawa",
             "top_GTR_engine",
-            "photo_galgano",
             "top_ahrweiler01",
             "top_DarkHangar01",
             "top_new_nur",
@@ -1212,6 +1232,11 @@ module DebugMenuPopup::Template::ScrolledWindow::clip::space::AllTopSceneAvailab
             "top_new_bonn",
             "top_kiritooshi_new",
             "top_whiteTown",
+            "allavt_topdemo",
+            "top_garage",
+        ];
+
+        var extra_flags = [
             "top_ahrweiler02",
             "top_ahrweiler03",
             "top_shorenin",
@@ -1219,21 +1244,30 @@ module DebugMenuPopup::Template::ScrolledWindow::clip::space::AllTopSceneAvailab
             "photo_luzern",
             "top_campo",
             "top_sangimi",
-            "tourDeItalia_bern",
-            "tourDeItalia_Luzern",
-            "tourDeItalia_Siena",
-            "tourDeItalia_Sangimi",
-            "tourDeItalia_galgano",
+            "photo_galgano",
+            //"tourDeItalia_bern",
+            //"tourDeItalia_Luzern",
+            //"tourDeItalia_Siena",
+            //"tourDeItalia_Sangimi",
+            //"tourDeItalia_galgano",
             "X1challenge_intro",
             "NASCAR_school_intro",
             "loeb_Rally_Challenge",
             "Topgear_intro",
             "X1_delivery",
-            "top_garage",
         ];
 
-        foreach (var flag in flags)
+        GAME_STATUS.user_profile.game_flags.top_scenes = 0;
+        GAME_STATUS.user_profile.game_flags.top_scenes_extra = 0;
+
+        foreach (var flag in default_flags)
             GAME_STATUS.user_profile.game_flags.setFlag("TOP_SCENES", flag, true);
+
+        if (res == DialogUtil::RESULT_YES)
+        {
+            foreach (var flag in extra_flags)
+                GAME_STATUS.user_profile.game_flags.setFlag("TOP_SCENES", flag, true);
+        }
 
         PleaseWait.end(context);
         return EVENTRESULT_FILTER;
@@ -1713,16 +1747,23 @@ module DebugMenuPopup::Template::ScrolledWindow::clip::space::TopSceneDebug::Exe
     {
         if (!DialogUtil::openConfirmDialog(context, DialogUtil::YESNO, "Master Mod Note\n
             This debug option allows only ONE specified scene to display in the main menu. Not recommended.\n
-            To revert this, use \"Add All Scenes to Top Screen\". Continue?"))
+            To revert this, use \"Add all sequences to main menu\" / \"Add All Scenes to Top Screen\". Continue?"))
             return EVENTRESULT_FILTER;
 
         PleaseWait.begin(context);
 
         var focused_item = Template::ScrolledWindow::clip::space::TopSceneDebug::OptionMenu.getItem();
+        var item_index = Template::ScrolledWindow::clip::space::TopSceneDebug::OptionMenu.index;
         var next_scene = focused_item.label.text;
 
         GAME_STATUS.user_profile.game_flags.top_scenes = 0;
-        GAME_STATUS.user_profile.game_flags.setFlag("TOP_SCENES", next_scene, true);
+        GAME_STATUS.user_profile.game_flags.top_scenes_extra = 0;
+        if (item_index <= 32)
+            GAME_STATUS.user_profile.game_flags.setFlag("TOP_SCENES", next_scene, true);
+        else
+            GAME_STATUS.user_profile.game_flags.setFlag("TOP_SCENES_EXTRA", next_scene, true);
+
+        gDebugScenes = true;
 
         PleaseWait.end(context);
 

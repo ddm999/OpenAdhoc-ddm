@@ -43,6 +43,11 @@ module GTTopRoot
             [ButtonHelpGT5.getCancelButtonName(), context.translate(ROOT, "Component", "Cancel")],
         ]);
 
+        if (gDebugScenes)
+            Upper::debug.visible = true;
+        else
+            Upper::debug.visible = false;
+
         setupSceneFace(context);
 
         ActorUtil::ResetInterpolators(Upper, false, true);
@@ -249,14 +254,14 @@ module GTTopRoot
         var use_favorite_car = main::GAME_STATUS.user_profile.option.limit_favorite_car_only && 
                                main::GAME_STATUS.user_profile.option.hasFavoriteCar();
 
-        
+
         if (!GAME_STATUS.user_profile.option.kiosk_mode)
         {
             if (garage_empty)
                 scene_alias = "grandtop_intro";
             else
             {
-                if (!GAME_STATUS.user_profile.game_flags.getFlag("TOP_SCENES", "allavt_topdemo"))
+                if (!GAME_STATUS.user_profile.game_flags.getFlag("TOP_SCENES", "allavt_topdemo") && !gDebugScenes)
                 {
                     scene_alias = "allavt_topdemo";
                     GAME_STATUS.user_profile.game_flags.setFlag("TOP_SCENES", "allavt_topdemo", true);
@@ -335,6 +340,40 @@ module GTTopRoot
                     "Topgear_intro",
                     "X1_delivery",
                     "allavt_topdemo",
+                    "grandtop_intro",
+                    "menu_lemans2010", // le mans, peugeot 908 hdi fap
+                    "photo_ahrweiler1_winter", // snowing & christmas decorations
+                    "autodemo", // dealership car detail
+                    "avatart_paper_doll", // basic avatar rotating
+                    "car_dealer", // old dealership background
+                    "garage", // old garage background, rotating car offset left
+                    "GT_AUTO_entrance", // gt auto guy stood infront of car, no background
+                    "tourDeItalia_roma_gold", // grand tour ending with gold trophy
+                    "top_GTA_2012", // GTA Academy cars overview, very dark
+                    "menu_online", // online menu, globe with lines
+                    "menu_online_ranking", // online menu, lines but no globe
+                    "menu_dealer_top", // dealership background
+                    "menu_car_select", // very zoomed car
+                    "license_congrats", // people walk in and through your car, default camera
+                    "license_congrats_2012gtacademy", // same as license_congrats but the guys are GTA branded
+                    //"countdown_crew", // guy stands in your car, default camera
+                    //"endurance_trophy_0", // just a rotating trophy
+                    //"event_race_trophy_0", // rotating piston trophy
+                    //"GPS_replay_menu", // top down old background
+                    //"license_trophy_0", // same as endurance trophy
+                    //"menu_AutoCamera_Check", // car with bad lighting and hard cut cameras
+                    //"menu_gift_car01", // car purchase scene
+                    //"menu_gttv", // crashes the game
+                    //"menu_top_alpha", // just the ruins scene again i think
+                    //"photo_nascar_pit", // crashes the game
+                    //"photo_nur_ruins", // same as new_nur(?) but camera and car goes through walls
+                    //"photo_pit", // same as top_garage with Ferrari 458 but no camera & no background 
+                    //"prize_trophy_0_0", // old style gold (_0)/silver (_1)/bronze (_2) trophy
+                    //"prize_trophy_0_3", // glass plate trophy
+                    //"prize_trophy_1_0", // all just the same as `_0_`
+                    //"prof_phot_cam0", // all these are profile photos
+                    //"rally_trophy_0", // funky sideways piston trophy
+                    //"X-1challenge_intro_E", // idk how this differs
                 ];
 
                 if (Garage2Util::Premium::getCount() > 0)
@@ -342,7 +381,11 @@ module GTTopRoot
 
                 foreach (var scene in top_scenes_all)
                 {
-                    if (GAME_STATUS.user_profile.game_flags.getFlag("TOP_SCENES", scene))   
+                    main_flag_check = GAME_STATUS.user_profile.game_flags.getFlag("TOP_SCENES", scene);
+                    extra_flag_check = GAME_STATUS.user_profile.game_flags.getFlag("TOP_SCENES_EXTRA", scene);
+                    if (main_flag_check && main_flag_check != -1)
+                        scene_list.push(scene);
+                    else if (extra_flag_check && extra_flag_check != -1)
                         scene_list.push(scene);
                 }
             }
@@ -386,7 +429,11 @@ module GTTopRoot
                 var index = GAME_STATUS.user_profile.context.top_scene_index;
                 index = (index + 1) % n;
                 GAME_STATUS.user_profile.context.top_scene_index = index;
-                scene_alias = scene_list[sequence[index]];
+
+                if (gDebugScenes)
+                    scene_alias = scene_list[index];
+                else
+                    scene_alias = scene_list[sequence[index]];
             }
             else
             {

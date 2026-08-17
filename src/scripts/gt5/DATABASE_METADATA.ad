@@ -74,7 +74,7 @@
 // For all tables that are present in the save file.
 
 // GlobalStatus.ad
-#define GLOBAL_STATUS_VERSION     249
+#define GLOBAL_STATUS_VERSION     250
 
 // Community boards (global_status/GameBbs.ad)
 #define BBS_TABLE_VERSION         2

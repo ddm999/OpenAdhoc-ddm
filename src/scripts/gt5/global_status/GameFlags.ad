@@ -83,6 +83,27 @@ module GameFlags
         static X1_delivery = 1 << 27;
         static top_garage = 1 << 28;
         static allavt_topdemo = 1 << 29;
+        static menu_lemans2010 = 1 << 30;
+        static photo_ahrweiler1_winter = 1 << 31;
+    }
+
+    module TOP_SCENES_EXTRA
+    {
+        static instance_name = "top_scenes_extra";
+
+        static autodemo = 1 << 0;
+        static avatart_paper_doll = 1 << 1;
+        static car_dealer = 1 << 2;
+        static garage = 1 << 3;
+        static GT_AUTO_entrance = 1 << 4;
+        static tourDeItalia_roma_gold = 1 << 5;
+        static top_GTA_2012 = 1 << 6;
+        static menu_online = 1 << 7;
+        static menu_online_ranking = 1 << 8;
+        static menu_dealer_top = 1 << 9;
+        static menu_car_select = 1 << 10;
+        static license_congrats = 1 << 11;
+        static license_congrats_2012gtacademy = 1 << 12;
     }
 
     module PHOTO_STAGES
@@ -223,6 +244,7 @@ module GameFlags
         st.define("user_status", STUByte());
         st.define("gttv_playable_movies", STUByte());
         st.define("top_scenes", STUInt());
+        st.define("top_scenes_extra", STUInt());
         st.define("photo_stages", STUShort());
         st.define("course_available", STUInt());
         st.define("car_available", STUByte());
@@ -242,6 +264,7 @@ module GameFlags
         instance.user_status = 0;
         instance.gttv_playable_movies = 0;
         instance.top_scenes = 0;
+        instance.top_scenes_extra = 0;
         instance.photo_stages = 0;
         instance.course_available = 0;
         instance.car_available = 0;
