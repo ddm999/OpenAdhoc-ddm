@@ -31,7 +31,7 @@ module GTTopProject
     static additional_projects;
     static additional_sounds;
 
-    static gDebugScenes = true;
+    static gDebugScenes = false;
 
     function onLoad(update_context)
     {

@@ -464,15 +464,33 @@ module GTTopRoot
         }
         else
         {
-            if (scene_alias == "top_garage")
-            {
-                var cars = Garage2Util::Premium::RandomPickup(1);
-                var cpp = cars[0];
-                cp = cpp.getCP();
-                var car_label = cp.getCarLabel();
+            var cars = Garage2Util::Premium::RandomPickup(1);
+            var cpp = cars[0];
+            var prem_cp = cpp.getCP();
+            var car_label = prem_cp.getCarLabel();
 
+            if (car_label.beginWith("_908_hdi_fap"))
+            {
+                var i = pdistd::MRandom::GetValue(0, 3);
+                if (i > 0)
+                {
+                    cp = prem_cp;
+                    scene_alias = "menu_lemans2010";
+                }
+            }
+            else if (scene_alias == "top_garage")
+            {
+                cp = prem_cp;
                 if (car_label.beginWith("nascar_"))
                     scene_alias = "top_garage_NASCAR";
+            }
+            else if (scene_alias.beginWith("top_ahrweiler"))
+            {
+                var current_time = pdiext::getBetterTimeLocal();
+                var m = current_time.month;
+                var d = current_time.day;
+                if (m == 12 && d >= 22 && d <= 28)
+                    scene_alias = "photo_ahrweiler1_winter";
             }
         }
 

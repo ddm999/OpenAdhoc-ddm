@@ -1215,8 +1215,8 @@ module DebugMenuPopup::Template::ScrolledWindow::clip::space::AllTopSceneAvailab
     {
         var res = DialogUtil::openConfirmDialog(context, DialogUtil::YESNOCLOSE, "Master Mod Note\n
             This debug option sets what scenes can display in the main menu.\n
-            Hit 'OK' for all unlockable scenes, 'Cancel' for only initial save scenes, or 'Close' to cancel.")
-        if (res == DialogUtil::RESULT_CLOSE)
+            Press 'OK' for all unlockable scenes, 'Close' for only initial save scenes, or 'Cancel' to cancel.")
+        if (res == DialogUtil::RESULT_NO)
             return EVENTRESULT_FILTER;
 
         PleaseWait.begin(context);
