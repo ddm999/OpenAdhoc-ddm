@@ -274,7 +274,7 @@ module ROOT
     method getUsedCarDataSpecial(context, sort_order)
     {
         var w = getWeek(context);
-        var res = main::pdistd::ReadFile("/APP_DATA_RAW/used_car/used_car_list_%{w}.xml");
+        var res = main::pdistd::ReadFile("/textdata/gt5/special_used_car/used_car_list_%{w}.xml");
         var car_list = Array();
         var usedcar_version = 0;
         var usedcar_title = "";
