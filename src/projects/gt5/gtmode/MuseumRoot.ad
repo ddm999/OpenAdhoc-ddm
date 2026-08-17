@@ -122,6 +122,12 @@ module ROOT
             try
             {
                 var museum_list = getOfflineMuseumListOrError(context);
+                if (museum_list == nil)
+                {
+                    ROOT.close(context);
+                    return EVENTRESULT_FILTER;
+                }
+
                 if (museum_list.size != MuseumFileUtil::getMuseumIdListCount())
                 {
                     var res = MuseumFileUtil::updateMuseumIdList(museum_list);
@@ -177,7 +183,7 @@ module ROOT
         var buf = fst["buffer"];
         if (buf == nil)
         {
-            DialogUtil::openConfirmDialog(context, DialogUtil::ERROR, "Museum folder missing in game directory?");
+            DialogUtil::openConfirmDialog(context, DialogUtil::ERROR, "Museum is still work in progress.\nIf you have local museum files, the folder is not set up correctly.");
             return nil;
         }
 
