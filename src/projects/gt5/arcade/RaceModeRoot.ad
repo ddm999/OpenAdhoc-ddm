@@ -454,6 +454,27 @@ module RaceModeRoot::Difficulty
         var candidate_data = folder_data.getItemData();
         main::GAME_STATUS.user_profile.context.arcade_difficulty = candidate_data.value_;
 
+        if (ArcadeProject::DifficultyEnum::MM_PRO == candidate_data.value_)
+        {
+            hide(context, false);
+            RaceModeRoot.Exit.hide(context, true);
+            OverLapRoot::ButtonHelpGT5.hide();
+
+            var data = SettingProject::MasterDifficultyOptions::Data(gMasterDifficultySettings);
+            var result = SettingProject::MasterDifficultyOptions.OpenDialog(context, data);
+            gMasterDifficultySettings = data.difficultySettings;
+
+            if (result)
+            {
+                gArcadeSequence.moveNextPage(context);
+            }
+
+            OverLapRoot::ButtonHelpGT5.appear();
+            appear(context, false, false);
+
+            return;
+        }
+
         gArcadeSequence.moveNextPage(context);
     }
 
