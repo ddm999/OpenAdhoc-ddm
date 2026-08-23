@@ -741,9 +741,16 @@ module GTTopRoot
     function onGpsReplay(context)
     {
         sound.play("ok");
-        Menus::MainMenu.saveFocusPosition();
-        PROJECT.history['LastPageName'] = ROOT.name;
-        SequenceUtil::startProject(context, "gps_replay", "gttop");
+
+        var res = DialogUtil::openConfirmDialog(context, DialogUtil::DEFAULT_NO, "Master Mod Note\n
+            This feature might not work and viewing it can cause the game to crash when you next start a race.\n
+            Not recommended. Continue?")
+        if (res)
+        {
+            Menus::MainMenu.saveFocusPosition();
+            PROJECT.history['LastPageName'] = ROOT.name;
+            SequenceUtil::startProject(context, "gps_replay", "gttop");
+        }
         return EVENTRESULT_FILTER;
     }
 
