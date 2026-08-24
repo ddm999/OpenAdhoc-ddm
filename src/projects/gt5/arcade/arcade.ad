@@ -201,10 +201,11 @@ module PROJECT
         }
 
         static mode_sequence = [ArcadeModeEnum::SINGLE_RACE: [CourseRoot, CarRoot],
+                                ArcadeModeEnum::QUICK_RACE: [CourseRoot, CarRoot],
                                 ArcadeModeEnum::TIME_ATTACK: [CourseRoot, CarRoot],
                                 ArcadeModeEnum::DRIFT_ATTACK: [CourseRoot, CarRoot],
                                 ArcadeModeEnum::SPLIT_BATTLE: [CourseRoot, CarSplitBaseRoot],
-                                ArcadeModeEnum::MY_GAME: [MyGameSelectRoot, CourseRoot, CarRoot]
+                                ArcadeModeEnum::MY_GAME: [MyGameSelectRoot, CourseRoot, CarRoot],
         ];
 
         attribute mode_;
@@ -291,6 +292,12 @@ module PROJECT
                 {
                     var gp = main::gtengine::MGameParameter();
                     gp.deepCopy(gp_);
+
+                    //mm: fix MyGame course select
+                    if (main::gtengine::MSpecDB::NO_CODE64 == gp.event.track.course_code)
+                    {
+                        gp.event.track.course_code = course_data_holder.getCourseCode();
+                    }
 
                     return goRaceSequence(context, gp.event.game_mode, gp, course_data_holder);
                 }
@@ -715,8 +722,7 @@ module PROJECT
             if (constraint.tcs == -1)
                 cp.quicktune_tcs = 5;
 
-            if (gp.event.game_mode == gtengine::GameMode::SINGLE_RACE ||
-                gp.event.game_mode == gtengine::GameMode::QUICK_RACE)
+            if (gp.event.game_mode == gtengine::GameMode::SINGLE_RACE)
             {
                 var map = gDifficultySetting[difficulty_name[difficulty]];
                 dp.manual = map["manual"];
@@ -727,7 +733,7 @@ module PROJECT
 
         var result;
         // mod: "Quick Race" uses the fast option screen instead of "Single Race: Easy"
-        if (difficulty == ArcadeProject::ArcadeModeEnum::QUICK_RACE)
+        if (main::GAME_STATUS.user_profile.context.arcade_game_mode == ArcadeModeEnum::QUICK_RACE)
         {
             if (cp.isATOnly())
             {

@@ -230,7 +230,8 @@ module RaceModeRoot::ModeSelector
             }
         }
 
-        if (arcade_mode == ArcadeModeEnum::SINGLE_RACE)
+        if (arcade_mode == ArcadeModeEnum::SINGLE_RACE
+            || arcade_mode == ArcadeModeEnum::QUICK_RACE)
         {
             self.hide(context, false);
             
@@ -284,6 +285,7 @@ module RaceModeRoot::ModeSelector
         switch(arcade_mode)
         {
             case ArcadeModeEnum::SINGLE_RACE:
+            case ArcadeModeEnum::QUICK_RACE:
                 disable = !main::GAME_STATUS.user_profile.option.visible_icon_singlerace;
                 break;
 
@@ -328,7 +330,9 @@ module RaceModeRoot::ModeSelector
                     ['value': ArcadeModeEnum::SINGLE_RACE, 'label': "SINGLE_RACE", 'image': "image/gt5/thumbnail/arcade_singlerace.dds"],
                     ['value': ArcadeModeEnum::TIME_ATTACK, 'label': "TIME_ATTACK", 'image': "image/gt5/thumbnail/arcade_timetrial.dds"],
                     ['value': ArcadeModeEnum::DRIFT_ATTACK, 'label': "DRIFT_ATTACK", 'image': "image/gt5/thumbnail/arcade_drifttrial.dds"],
-                    ['value': ArcadeModeEnum::SPLIT_BATTLE, 'label': "SPLIT_BATTLE", 'image': "image/gt5/thumbnail/arcade_2p.dds"]];
+                    ['value': ArcadeModeEnum::SPLIT_BATTLE, 'label': "SPLIT_BATTLE", 'image': "image/gt5/thumbnail/arcade_2p.dds"],
+                    ['value': ArcadeModeEnum::MY_GAME, 'label': "MY_GAME", 'image': "image/gt5/thumbnail/arcade_usercustom.dds"],
+                ];
             }
 
             var selected_arcade_mode = ArcadeProject.history['RaceModeRoot::SelectedArcadeMode'];
@@ -540,7 +544,8 @@ module RaceModeRoot::ListBox3D
         "image/gt5/flyer/flyer_arcade_singlerace.dds",
         "image/gt5/flyer/flyer_arcade_timetrial.dds",
         "image/gt5/flyer/flyer_arcade_drifttrial.dds",
-        "image/gt5/flyer/flyer_arcade_2p.dds"
+        "image/gt5/flyer/flyer_arcade_2p.dds",
+        "image/gt5/flyer/flyer_arcade_usercustom.dds"
     ];
 
 
