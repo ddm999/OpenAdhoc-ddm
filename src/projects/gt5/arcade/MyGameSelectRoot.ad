@@ -267,18 +267,31 @@ module MyGameSelectRoot::EventSelector
             case gtengine::GameMode::SINGLE_RACE:
                 ModeName.text = context.translate(RaceModeRoot, "E_LABEL_SINGLE_RACE");
                 break;
+            case gtengine::GameMode::EVENT_RACE:
+                ModeName.text = context.translate(RaceModeRoot, "E_LABEL_EVENT_RACE");
+                break;
+            case gtengine::GameMode::EVENT_RALLY:
+                ModeName.text = context.translate(RaceModeRoot, "E_LABEL_EVENT_RALLY");
+                break;
             case gtengine::GameMode::TIME_ATTACK:
                 ModeName.text = context.translate(RaceModeRoot, "E_LABEL_TIME_ATTACK");
                 break;
             case gtengine::GameMode::DRIFT_ATTACK:
                 ModeName.text = context.translate(RaceModeRoot, "E_LABEL_DRIFT_ATTACK");
                 break;
+            case gtengine::GameMode::LICENSE:
+            case gtengine::GameMode::SCHOOL:
+                ModeName.text = context.translate(RaceModeRoot, "E_LABEL_LICENSE");
+                break;
+            case gtengine::GameMode::TOUR:
+                ModeName.text = context.translate(RaceModeRoot, "E_LABEL_TOUR");
+                break;
             case gtengine::GameMode::RACE_EDIT:
                 ModeName.text = context.translate(RaceModeRoot, "E_LABEL_RACE_EDIT");
                 ModeName.TransientReset();
                 return;
             default:
-                ModeName.text = "unknown mode";
+                ModeName.text = "unknown mode (likely buggy)";
         }
 
         var course_name = context.translate(MyGameSelectRoot, "Free Course Choice");
