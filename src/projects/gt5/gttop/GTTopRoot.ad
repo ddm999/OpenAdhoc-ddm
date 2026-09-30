@@ -1662,7 +1662,7 @@ module GTTopRoot::PopupNews
 
     method initializeLocal(context)
     {
-        var res = main::pdistd::ReadFile("/APP_DATA_RAW/news/news.xml");
+        var res = main::pdistd::ReadFile("/textdata/gt5/news/news.xml");
         if (res["result"] != main::pdistd::FileError::OK)
             return;
 
