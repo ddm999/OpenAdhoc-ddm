@@ -265,40 +265,42 @@ module MyGameSelectRoot::EventSelector
         switch (gp.event.game_mode)
         {
             case gtengine::GameMode::SINGLE_RACE:
-                ModeName.text = context.translate(RaceModeRoot, "E_LABEL_SINGLE_RACE");
+                ModeName.text = context.translate(RaceModeRoot, "LABEL_SINGLE_RACE");
                 break;
             case gtengine::GameMode::EVENT_RACE:
-                ModeName.text = context.translate(RaceModeRoot, "E_LABEL_EVENT_RACE");
+                ModeName.text = context.translate(RaceModeRoot, "LABEL_EVENT_RACE");
                 break;
             case gtengine::GameMode::EVENT_RALLY:
-                ModeName.text = context.translate(RaceModeRoot, "E_LABEL_EVENT_RALLY");
+                ModeName.text = context.translate(RaceModeRoot, "LABEL_EVENT_RALLY");
                 break;
             case gtengine::GameMode::TIME_ATTACK:
-                ModeName.text = context.translate(RaceModeRoot, "E_LABEL_TIME_ATTACK");
+                ModeName.text = context.translate(RaceModeRoot, "LABEL_TIME_ATTACK");
                 break;
             case gtengine::GameMode::DRIFT_ATTACK:
-                ModeName.text = context.translate(RaceModeRoot, "E_LABEL_DRIFT_ATTACK");
+                ModeName.text = context.translate(RaceModeRoot, "LABEL_DRIFT_ATTACK");
                 break;
             case gtengine::GameMode::LICENSE:
             case gtengine::GameMode::SCHOOL:
-                ModeName.text = context.translate(RaceModeRoot, "E_LABEL_LICENSE");
+                ModeName.text = context.translate(RaceModeRoot, "LABEL_LICENSE");
                 break;
             case gtengine::GameMode::TOUR:
-                ModeName.text = context.translate(RaceModeRoot, "E_LABEL_TOUR");
+                ModeName.text = context.translate(RaceModeRoot, "LABEL_TOUR");
                 break;
             case gtengine::GameMode::RACE_EDIT:
-                ModeName.text = context.translate(RaceModeRoot, "E_LABEL_RACE_EDIT");
+                ModeName.text = context.translate(RaceModeRoot, "LABEL_RACE_EDIT");
                 ModeName.TransientReset();
                 return;
             default:
-                ModeName.text = "unknown mode (likely buggy)";
+                ModeName.text = context.translate(RaceModeRoot, "LABEL_UNKNOWN");
+                ModeName.TransientReset();
+                return;
         }
 
         var course_name = context.translate(MyGameSelectRoot, "Free Course Choice");
         if (main::gtengine::MSpecDB::NO_CODE64 != gp.event.track.course_code)
         {
             var course_info = CourseData::getCourseInfo(gp.event.track.course_code);
-            course_name = context.translate(CourseRoot, "CourseName", course_info.name);
+            course_name = context.translate(MyGameSelectRoot, "CourseName", course_info.name);
         }
         ModeName.text += " / %{course_name}";
 

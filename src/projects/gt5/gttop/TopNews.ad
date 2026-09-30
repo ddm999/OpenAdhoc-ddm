@@ -29,7 +29,8 @@ module News
     function loadLocalArticles()
     {
         sLocalArticles = [];
-        var res = main::pdistd::ReadFile("/APP_DATA_RAW/news/news.xml");
+        //mm: TODO: localisation support
+        var res = main::pdistd::ReadFile("/textdata/gt5/news/news.xml");
         if (res["result"] != main::pdistd::FileError::OK)
             return;
 

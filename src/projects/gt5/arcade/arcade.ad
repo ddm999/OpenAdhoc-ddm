@@ -732,7 +732,7 @@ module PROJECT
         }
 
         var result;
-        // mod: "Quick Race" uses the fast option screen instead of "Single Race: Easy"
+        //mm: "Quick Race" uses the fast option screen instead of "Single Race: Easy"
         if (main::GAME_STATUS.user_profile.context.arcade_game_mode == ArcadeModeEnum::QUICK_RACE)
         {
             if (cp.isATOnly())
