@@ -224,16 +224,17 @@ module UserProfile
             method addCash(context, value, over_limit_message = false)
             {
                 var cr = self.cash + value;
-                if (cr > (2000000000 / 100).toInt())
+                //mm: raise money limit from 20 million to 2 billion by removing the 100 divisor
+                if (cr > (2000000000).toInt())
                 {
                     if (over_limit_message)
                     {
-                        var cash_max_str = main::pdiext::MMisc::GetMoneyString((2000000000  / 100).toInt());
+                        var cash_max_str = main::pdiext::MMisc::GetMoneyString((2000000000).toInt());
                         var error_msg = context.translate(context.getCursorProject(), "Component", "YOU_CANNOT_GET_MONEY_MORE").build(cash_max_str);
                         DialogUtil::openConfirmDialog(context, DialogUtil::OK, error_msg);
                     }
 
-                    cr = (2000000000 / 100).toInt();
+                    cr = (2000000000).toInt();
                 }
                 else if (self.cash < 0)
                     cr = 0;
@@ -243,12 +244,12 @@ module UserProfile
 
             method checkCashOverLimit(value)
             {
-                return self.cash + value > (2000000000 / 100).toInt()
+                return self.cash + value > (2000000000).toInt()
             }
 
             method getCashLimit()
             {
-                return (2000000000 / 100).toInt();
+                return (2000000000).toInt();
             }
 
             function getNeedTotalPointForLevelUp(target_level)

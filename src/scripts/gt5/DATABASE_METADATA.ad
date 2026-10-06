@@ -109,11 +109,12 @@
 #define NEWS_READ_TABLE_NAME       "t_news_read"
 
 // Garage (global_status/Garage.ad)
-#define GARAGE_TABLE_VERSION       15
+#define GARAGE_TABLE_VERSION       16
 #define GARAGE_TABLE_NAME          "t_garage"
 
 #define GARAGE_MAX_CARS            2000
-#define GARAGE_MAX_FAVORITE        100
+//mm: increase favourite cars max from 200 -> 1000
+#define GARAGE_MAX_FAVORITE        1000
 #define GARAGE_MAX_ONLINE          6
 
 // Import Garage (PSP) (global_status/ImportGarage.ad)
