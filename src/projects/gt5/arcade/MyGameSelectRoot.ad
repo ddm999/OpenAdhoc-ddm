@@ -296,7 +296,7 @@ module MyGameSelectRoot::EventSelector
                 return;
         }
 
-        var course_name = context.translate(MyGameSelectRoot, "Free Course Choice");
+        var course_name = context.translate(MyGameSelectRoot, "Arcade", "free_crs");
         if (main::gtengine::MSpecDB::NO_CODE64 != gp.event.track.course_code)
         {
             var course_info = CourseData::getCourseInfo(gp.event.track.course_code);
@@ -304,7 +304,7 @@ module MyGameSelectRoot::EventSelector
         }
         ModeName.text += " / %{course_name}";
 
-        var car_name = context.translate(MyGameSelectRoot, "Free Car Choice");
+        var car_name = context.translate(MyGameSelectRoot, "Arcade", "free_car");
         if (1 == gp.event.constraint.cars.size)
         {
             var car_label = gp.event.constraint.cars[0].getCarLabel();
@@ -312,7 +312,7 @@ module MyGameSelectRoot::EventSelector
         } 
         else if (1 < gp.event.constraint.cars.size)
         {
-            car_name = context.translate(MyGameSelectRoot, "Preset Cars");
+            car_name = context.translate(MyGameSelectRoot, "Arcade", "prs_car");
         }
         ModeName.text += " / %{car_name}";
 
