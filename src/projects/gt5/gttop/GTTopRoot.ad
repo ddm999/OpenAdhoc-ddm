@@ -600,8 +600,11 @@ module GTTopRoot
 
         sound.play("ok");
 
+        //mm: reduce login prompts
+        /*
         if (pdistd::MNetworkInterface::isUp() && !GAME_STATUS.config.no_request_NP_sign_in)
             LoginUtil::tryLogin(context);
+        */
 
         Menus::MainMenu.saveFocusPosition();
         PROJECT.history['LastPageName'] = ROOT.name;
@@ -689,8 +692,11 @@ module GTTopRoot
 
         sound.play("ok");
 
+        //mm: reduce login prompts
+        /*
         if (pdistd::MNetworkInterface::isUp())
             LoginUtil::tryLogin(context);
+        */
 
         Menus::MainMenu.saveFocusPosition();
         PROJECT.history['LastPageName'] = ROOT.name;
@@ -828,8 +834,11 @@ module GTTopRoot
 
         if (index != LOUNGE_MODE_LAN_BATTLE)
         {
+            //mm: reduce login prompts
+            /*
             if (pdistd::MNetworkInterface::isUp())
                 LoginUtil::tryLogin(context);
+            */
 
             if (!LoginUtil::isOnline())
             {
@@ -1860,8 +1869,9 @@ module GTTopRoot::PopupNews
             {
                 main::sound.play("ok");
 
-                if (pdistd::MNetworkInterface::isUp())
-                    LoginUtil::tryLogin(context);
+                //mm: reduce login prompts
+                //if (pdistd::MNetworkInterface::isUp())
+                //    LoginUtil::tryLogin(context);
 
                 if (!LoginUtil::isOnline())
                 {
@@ -1916,8 +1926,11 @@ module GTTopRoot::hidden
         {
             main::sound.play("ok");
 
+            //mm: reduce login prompts
+            /*
             if (pdistd::MNetworkInterface::isUp())
                 LoginUtil::tryLogin(context);
+            */
 
             if (!LoginUtil::isOnline())
             {
