@@ -465,37 +465,44 @@ module GTTopRoot
         else
         {
             var cars = Garage2Util::Premium::RandomPickup(1);
-            var cpp = cars[0];
-            var prem_cp = cpp.getCP();
-            var car_label = prem_cp.getCarLabel();
-
-            if (car_label.beginWith("_908_hdi_fap"))
+            if (cars.size > 0)
             {
-                var i = pdistd::MRandom::GetValue(0, 3);
-                if (i > 0)
+                var cpp = cars[0];
+                var prem_cp = cpp.getCP();
+                var car_label = prem_cp.getCarLabel();
+
+                if (car_label.beginWith("_908_hdi_fap"))
+                {
+                    var i = pdistd::MRandom::GetValue(0, 3);
+                    if (i > 0)
+                    {
+                        cp = prem_cp;
+                        scene_alias = "menu_lemans2010";
+                    }
+                }
+                else if (scene_alias == "top_garage")
                 {
                     cp = prem_cp;
-                    scene_alias = "menu_lemans2010";
+                    if (car_label.beginWith("nascar_"))
+                        scene_alias = "top_garage_NASCAR";
                 }
-            }
-            else if (scene_alias == "top_garage")
-            {
-                cp = prem_cp;
-                if (car_label.beginWith("nascar_"))
-                    scene_alias = "top_garage_NASCAR";
-            }
-            else if (scene_alias.beginWith("top_ahrweiler"))
-            {
-                var current_time = pdiext::getBetterTimeLocal();
-                var m = current_time.month;
-                var d = current_time.day;
-                if (m == 12 && d >= 22 && d <= 28)
-                    scene_alias = "photo_ahrweiler1_winter";
+                else if (scene_alias.beginWith("top_ahrweiler"))
+                {
+                    var current_time = pdiext::getBetterTimeLocal();
+                    var m = current_time.month;
+                    var d = current_time.day;
+                    if (m == 12 && d >= 22 && d <= 28)
+                        scene_alias = "photo_ahrweiler1_winter";
+                }
             }
         }
 
         var dp = GAME_STATUS.user_profile.residence.getPlayer(0);
-        Upper::debug.text = "scene: %s / cp: %s".format(scene_alias, cp.getCarLabel());
+        Upper::debug.text = "scene: %s".format(scene_alias);
+        if (cp != nil)
+        {
+            Upper::debug.text += " / cp: %s".format(cp.getCarLabel());
+        }
         SceneFaceUtil::loadScene(SceneFace, scene_alias, cp, dp, false);
 
         if (scene_alias == "color_select")
