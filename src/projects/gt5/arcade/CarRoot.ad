@@ -1,21 +1,11 @@
+//---------------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: Copyright (C) 2026 Nenkai, OpenAdhoc Contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-FileAttributionText: https://github.com/Nenkai/OpenAdhoc
+// SPDX-FileNotice: AI usage and consumption is prohibited. See AGENTS.md for policy.
+//---------------------------------------------------------------------------------------
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-module CarRoot
+module ROOT
 {
     hidden.visible = false;
 
@@ -75,13 +65,13 @@ module CarRoot
             {
 
                 CarFinder.set_open_mode(CarFinder::OPEN_MODE::CUSTOM);
-                context.pushPage(CarRoot);
+                context.pushPage(ROOT);
                 return true;
             }
         }
         
         CarFinder.set_open_mode(CarFinder::OPEN_MODE::ARCADE);
-        context.pushPage(CarRoot);
+        context.pushPage(ROOT);
         return true;
     }
 
@@ -91,7 +81,7 @@ module CarRoot
 
         SceneFace.clearCar();
 
-        ArcadeProject::ignorePadEvent(true, true);
+        PROJECT::ignorePadEvent(true, true);
 
         self.FadeEffect.reverse = true;
         self.FadeEffect.on_effect_end = self.close_end;
@@ -105,7 +95,7 @@ module CarRoot
         self.FadeEffect.reset();
         context.closePage(self);
 
-        ArcadeProject::ignorePadEvent(false);
+        PROJECT::ignorePadEvent(false);
     }
 
     method reset_widgets()
@@ -132,7 +122,7 @@ module CarRoot
 
     method onInitialize(context)
     {
-        CarRoot.setFocus(nil);
+        ROOT.setFocus(nil);
 
         OverLapRoot.onCarSelect(context);
 
@@ -156,10 +146,10 @@ module CarRoot
 
         self.insensitive = false;
 
-        if (0 < ArcadeProject.gLeaveDetectTime)
+        if (PROJECT.gLeaveDetectTime > 0)
         {
             LeaveDetectUtil::reset(context);
-            LeaveDetectUtil::begin(context, ArcadeProject.gLeaveDetectTime, CarRoot, ArcadeProject.onLeaveDetect, nil, true);
+            LeaveDetectUtil::begin(context, PROJECT.gLeaveDetectTime, ROOT, PROJECT.onLeaveDetect, nil, true);
         }
 
         var gp = gArcadeSequence.getGP();
@@ -290,7 +280,7 @@ module CarRoot
         var car_code = cp.getCarCode();
 
         official_name.text = main::gtengine::MSpecDB::getCarShortName_A(car_code).upcase();
-        CarRoot.official_name.TransientReset();
+        ROOT.official_name.TransientReset();
 
         var is_ps3 = main::gtengine::MSpecDB::checkGenericFlag("has_premium_model", car_code);
         OverLapRoot::ButtonHelpGT5.setInsensitive("Square", !is_ps3);
@@ -376,8 +366,8 @@ module CarRoot
             
                 if (!on_initialize)
                 {
-                    ArcadeProject::ignorePadEvent(true);
-                    self.finder_.onFocus(context, CarRoot);
+                    PROJECT::ignorePadEvent(true);
+                    self.finder_.onFocus(context, ROOT);
                 }
             } 
             else 
@@ -421,12 +411,12 @@ module CarRoot
 
         method appear(on_root_open = false)
         {
-            ArcadeProject::ignorePadEvent(true);
+            PROJECT::ignorePadEvent(true);
 
             var end_move = method(context) {
                 self.insensitive = false;
-                context.pushEvent(main::menu::MFunctionEvent(self.finder_.onFocus, context, CarRoot));
-                ArcadeProject::ignorePadEvent(false);
+                context.pushEvent(main::menu::MFunctionEvent(self.finder_.onFocus, context, ROOT));
+                PROJECT::ignorePadEvent(false);
                 self.MoveEffect.on_effect_end = nil;
             }
 
@@ -445,7 +435,7 @@ module CarRoot
         method hide(context, warp)
         {
             self.insensitive = true;
-            CarRoot.setFocus(nil);
+            ROOT.setFocus(nil);
 
             BalloonTip.reset_value();
 
@@ -636,7 +626,7 @@ module CarRoot
 
         method cb_focused_car(context, candidate_data, item_w, arg)
         {
-            ArcadeProject::ignorePadEvent(false);
+            PROJECT::ignorePadEvent(false);
 
             |var car, var car_name, var is_enable| = candidate_data.value_;
             var tab_id = arg;
@@ -667,9 +657,9 @@ module CarRoot
             {
                 SceneFace.clearCar();
                 SceneFace.setCar(cp);
-                CarRoot.reset_widgets();
+                ROOT.reset_widgets();
             
-                context.addTimeOut("change_car", CarRoot.load_car, context, nil, tab_id);
+                context.addTimeOut("change_car", ROOT.load_car, context, nil, tab_id);
 
                 context.setTimeOut("change_car", 0.1);
             }
@@ -1016,7 +1006,7 @@ module CarRoot
             self.Info::tuner_logo.on_delay_load_complete = *self.*delay_load_complete;
             self.Info::tuner_logo.image_path = "piece/tunner_logo_L/%{tuner_label}.img";
             self.Info::flag.image_path = "piece/flag_menu/%{country_code}.img";
-            self.Info::tuner_name.text = context.translate(CarRoot, "TunerNameI18n", tuner_label);
+            self.Info::tuner_name.text = context.translate(ROOT, "TunerNameI18n", tuner_label);
 
             var is_ps3 = main::gtengine::MSpecDB::checkGenericFlag("has_premium_model", car_code);
             self.Info::premium.visible = is_ps3;
@@ -1120,7 +1110,7 @@ module CarRoot
 
         method open(context, car_code, focus_index)
         {
-            ArcadeProject::ignorePadEvent(true);
+            PROJECT::ignorePadEvent(true);
 
             CarRoot.Filters.visible = false;
             self.prev_focus_ = CarRoot.getFocusWidget();
@@ -1130,8 +1120,8 @@ module CarRoot
 
             var end_move = method(context) {
                 self.insensitive = false;
-                context.pushEvent(main::menu::MFunctionEvent(self.finder_.onFocus, context, CarRoot));
-                ArcadeProject::ignorePadEvent(false);
+                context.pushEvent(main::menu::MFunctionEvent(self.finder_.onFocus, context, ROOT));
+                PROJECT::ignorePadEvent(false);
                 self.MoveEffect.on_effect_end = nil;
             }
             self.MoveEffect.reverse = false;
@@ -1162,7 +1152,7 @@ module CarRoot
             var dummy_initial_data = UIKitProject::FinderRoot.InitialData(UIKitProject::FinderRoot.makeCandidates([]));
             self.finder_.replaceFolder(context, dummy_initial_data);
 
-            CarRoot.setFocus(self.prev_focus_);
+            ROOT.setFocus(self.prev_focus_);
             self.prev_focus_ = nil;
 
             BalloonTip.reset_value();
@@ -1443,7 +1433,7 @@ module CarRoot
 
                     SceneActor::CarFadeActor.start();
 
-                    if (!CarRoot::sCaptureMode)
+                    if (!ROOT::sCaptureMode)
                     {
 
                         if (!SceneActor::CarFadeActor.reverse && 0.5 < self.scene_fade)
@@ -1455,7 +1445,7 @@ module CarRoot
                         self.setEntityRotateVelocityY("CAR", "car0", SceneActor.rotate);
                     } else {
                     
-                        self.setEntityRotateY("CAR", "car0", CarRoot::hidden::CaptureCarAngleValue.text.toInt());
+                        self.setEntityRotateY("CAR", "car0", ROOT::hidden::CaptureCarAngleValue.text.toInt());
                     }
                 }
                 
