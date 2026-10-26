@@ -457,9 +457,9 @@ module GTTopRoot
         }
         else
         {
-            var cars = Garage2Util::Premium::RandomPickup(1);
-            if (cars.size > 0)
+            if (Garage2Util::Premium::getCount() > 0)
             {
+                var cars = Garage2Util::Premium::RandomPickup(1);
                 var cpp = cars[0];
                 var prem_cp = cpp.getCP();
                 var car_label = prem_cp.getCarLabel();
