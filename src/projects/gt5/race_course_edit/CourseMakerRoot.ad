@@ -1775,11 +1775,13 @@ module ROOT
                         ContentParams("time_progress_speed", hidden::ItemSlider, time_prog_slider_params, true)
                     ];
 
-                    if (GetVersionBranch() == "runviewer")
+                    //mm: allow course_type (point-to-point) selection
+                    //if (GetVersionBranch() == "runviewer")
                         common_params.push(ContentParams("course_type", hidden::ItemOptionMenu, course_type_option_menu_params, true));
 
-                    if (GetVersionBranch() == "runviewer")
-                    {
+                    //mm: allow length selection
+                    //if (GetVersionBranch() == "runviewer")
+                    //{
                         var lengthy_slider_params = SliderParams();
                         lengthy_slider_params.value = 0.5;
                         lengthy_slider_params.range = [0.5, 10000.0];
@@ -1787,8 +1789,10 @@ module ROOT
 
                         lengthy_slider_params.format_callback = function (context, value, slider) 
                         {
-                            var unit = context.translate(ROOT, "Unit", main::pdiext::MUnit::GetUnitKeywordOfCourseLength());
-                            return value <= 0.5 ? zero_text : "%d%s".format(value.toInt(), unit);
+                            //mm: fix LENGTHY to correctly only display as meters
+                            return value <= 0.5 ? zero_text : "%dm".format(value.toInt());
+                            //var unit = context.translate(ROOT, "Unit", main::pdiext::MUnit::GetUnitKeywordOfCourseLength());
+                            //return value <= 0.5 ? zero_text : "%d%s".format(value.toInt(), unit);
                         };
 
                         lengthy_slider_params.is_zero_callback = function (value, slider) 
@@ -1798,7 +1802,7 @@ module ROOT
 
                         lengthy_slider_params.zero_text = zero_text;
                         common_params.push(ContentParams("lengthy", hidden::ItemSlider, lengthy_slider_params, true));
-                    }
+                    //}
 
                     return common_params;
                 }
@@ -2830,7 +2834,7 @@ module ROOT
     {
         method initialize(context)
         {
-            self.visible = pdiext::isQABuild();
+            self.visible = true; //pdiext::isQABuild();
         }
 
         method update_status(context, basic, common)
@@ -2874,7 +2878,7 @@ module ROOT
         {
             method onInitialize(context)
             {
-                self.visible = GetVersionBranch() == "runviewer";
+                self.visible = true; //GetVersionBranch() == "runviewer";
             }
 
             module Start
@@ -2906,7 +2910,7 @@ module ROOT
         {
             method onInitialize(context)
             {
-                self.visible = GetVersionBranch() == "runviewer";
+                self.visible = true; //GetVersionBranch() == "runviewer";
             }
 
             module CheckBox
