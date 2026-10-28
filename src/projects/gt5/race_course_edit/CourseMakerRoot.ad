@@ -534,6 +534,10 @@ module ROOT
             var kind = generate_param.kind;
             self.common["course_type"] = kind;
 
+            //mm: correctly load LENGTHY
+            var lengthy = generate_param.lengthy;
+            self.common["lengthy"] = lengthy;
+
             var sections = generate_param.sections;
             var num_section = sections.size;
             self.common["num_section"] = sections.size;
@@ -1145,7 +1149,7 @@ module ROOT
             self.data["width"] = 0.5;
             self.data["curvy"] = 0.5;
             self.data["sharpness"] = 0.5;
-            self.data["bank_angularity"] = 0.5;
+            self.data["bank_angularity"] = 0.0; //0.5;
         }
 
         method __get_elem__(k)
@@ -1578,6 +1582,7 @@ module ROOT
                 {
                     attribute value;
                     attribute range;
+                    attribute original_range;
                     attribute step;
                     attribute format_callback;
                     attribute is_zero_callback;
@@ -1588,10 +1593,11 @@ module ROOT
                     attribute conv_index_to_value;
                     attribute conv_value_to_index;
 
-                    method __init__(v, r, s, fc, izc, zt)
+                    method __init__(v, r, or, s, fc, izc, zt)
                     {
                         self.value = v;
                         self.range = r;
+                        self.original_range = or;
                         self.step = s;
                         self.format_callback = fc;
                         self.is_zero_callback = izc;
@@ -1809,22 +1815,27 @@ module ROOT
 
                 method setup_section_params(context)
                 {
+                    //TODO: make slider changes not cause track updates on same seed / settings
+                    // add notes about extended range; maybe highlight red when value is outside regular bounds (0.0-1.0)
                     var curvy_slider_params = SliderParams();
-                    curvy_slider_params.value = 5;
-                    curvy_slider_params.range = [0, 10];
-                    curvy_slider_params.step = 1;
+                    curvy_slider_params.value = 0.5;
+                    curvy_slider_params.original_range = [0, 1.0];
+                    curvy_slider_params.range = [-0.5, 1.0];
+                    curvy_slider_params.step = 0.1;
 
                     curvy_slider_params.conv_index_to_value = function (index, slider) 
                     {
-                        return index.toFloat() / 10.0;
+                        return index;//.toFloat() / 10.0;
                     };
 
                     curvy_slider_params.conv_value_to_index = function (value, slider)
                     {
-                        var index = value * 10.0;
-                        return index.toInt();
+                        return value;
+                        //var index = value * 10.0;
+                        //return index.toInt();
                     };
 
+                    /*
                     var normalize_index_type1 = [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5];
                     var normalize_index_type2 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
                     var normalize_rank = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
@@ -1851,51 +1862,68 @@ module ROOT
                     {
                         normalize_index_rank_pair_type2[normalize_index_type2[i]] = normalize_rank[i];
                     }
+                    */
 
                     var conv_index_to_value = function (index, slider) 
                     {
+                        return index;
+                        /*
                         var rank = slider.norm_index_rank_pair[index.toInt()];
                         var normalized_value = (rank.toFloat() - 1.0) / (normalize_rank_max.toFloat() - 1.0);
                         var value = normalized_value + slider.norm_value_shift;
                         return value;
+                        */
                     };
 
                     var conv_value_to_index = function (value, slider) 
                     {
+                        return value;
+                        /*
                         var v = (value * 10.0) - (slider.norm_value_shift * 10.0);
                         var index = slider.norm_index[v.toInt()];
                         return index;
+                        */
                     };
 
                     var width_slider_params = SliderParams();
-                    width_slider_params.value = normalize_index_default_type1;
-                    width_slider_params.range = [normalize_index_min_type1, normalize_index_max_type1];
-                    width_slider_params.step = 1;
+                    width_slider_params.value = 0.5;//normalize_index_default_type1;
+                    width_slider_params.original_range = [0.0, 1.0];
+                    width_slider_params.range = [-1.5, 5.0];//[normalize_index_min_type1, normalize_index_max_type1];
+                    width_slider_params.step = 0.1;//1;
+                    /*
                     width_slider_params.norm_value_shift = 0.0;
                     width_slider_params.norm_index = normalize_index_type1;
                     width_slider_params.norm_index_rank_pair = normalize_index_rank_pair_type1;
+                    */
                     width_slider_params.conv_index_to_value = conv_index_to_value;
                     width_slider_params.conv_value_to_index = conv_value_to_index;
 
                     var sharpness_slider_params = SliderParams();
-                    sharpness_slider_params.value = normalize_index_default_type1;
-                    sharpness_slider_params.range = [normalize_index_min_type1, normalize_index_max_type1];
-                    sharpness_slider_params.step = 1;
+                    sharpness_slider_params.value = 0.5;//normalize_index_default_type1;
+                    sharpness_slider_params.original_range = [0.0, 1.0];
+                    sharpness_slider_params.range = [-1.0, 2.0];//[normalize_index_min_type1, normalize_index_max_type1];
+                    sharpness_slider_params.step = 0.1;//1;
+                    /*
                     sharpness_slider_params.norm_value_shift = 0.0;
                     sharpness_slider_params.norm_index = normalize_index_type1;
                     sharpness_slider_params.norm_index_rank_pair = normalize_index_rank_pair_type1;
+                    */
                     sharpness_slider_params.conv_index_to_value = conv_index_to_value;
                     sharpness_slider_params.conv_value_to_index = conv_value_to_index;
+
 
                     var bank_angularitys = ROOT.model.get_basic_data(context, "bank_angularitys");
                     var bank_slider_params = SliderParams();
 
-                    bank_slider_params.value = normalize_index_type2[bank_angularitys[2]];
-                    bank_slider_params.range = [normalize_index_type2[bank_angularitys[0]], normalize_index_type2[bank_angularitys[1]]];
-                    bank_slider_params.step = 1;
+                    bank_slider_params.value = (bank_angularitys[2]+5)/10;//normalize_index_type2[];
+                    bank_slider_params.original_range = [(bank_angularitys[0]+5)/10, (bank_angularitys[1]+5)/10];//[normalize_index_type2[], normalize_index_type2[bank_angularitys[1]]];
+                    bank_slider_params.range = [0.0, 2.0];
+                    bank_slider_params.step = 0.1;//1;
+                    /*
                     bank_slider_params.norm_value_shift = 0.5;
                     bank_slider_params.norm_index = normalize_index_type2;
                     bank_slider_params.norm_index_rank_pair = normalize_index_rank_pair_type2;
+                    */
                     bank_slider_params.conv_index_to_value = conv_index_to_value;
                     bank_slider_params.conv_value_to_index = conv_value_to_index;
 
@@ -2575,6 +2603,12 @@ module ROOT
                 {
                     slider.defineAttribute('conv_value_to_index');
                     slider.conv_value_to_index = param.args.conv_value_to_index;
+                }
+
+                if (!slider.defined('original_range'))
+                {
+                    slider.defineAttribute('original_range');
+                    slider.original_range = param.args.original_range;
                 }
 
                 if (!slider.defined('real_min'))
