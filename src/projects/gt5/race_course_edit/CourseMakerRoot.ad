@@ -16,6 +16,9 @@ module ROOT
     attribute last_error;
     attribute already_decided;
 
+    static sSliderValueColor = menu::MColorObject(204.0 / 255.0, 221.0 / 255.0, 240.0 / 255.0);
+    static sSliderRedColor = menu::MColorObject(1.0, 0.2, 0.2);
+
     function get_specific_time(second)
     {
         |var hour, var min, var sec| = PROJECT::get_time_array(second);
@@ -1149,7 +1152,7 @@ module ROOT
             self.data["width"] = 0.5;
             self.data["curvy"] = 0.5;
             self.data["sharpness"] = 0.5;
-            self.data["bank_angularity"] = 0.0; //0.5;
+            self.data["bank_angularity"] = 0.5;
         }
 
         method __get_elem__(k)
@@ -1815,115 +1818,59 @@ module ROOT
 
                 method setup_section_params(context)
                 {
-                    //TODO: make slider changes not cause track updates on same seed / settings
-                    // add notes about extended range; maybe highlight red when value is outside regular bounds (0.0-1.0)
-                    var curvy_slider_params = SliderParams();
-                    curvy_slider_params.value = 0.5;
-                    curvy_slider_params.original_range = [0, 1.0];
-                    curvy_slider_params.range = [-0.5, 1.0];
-                    curvy_slider_params.step = 0.1;
-
-                    curvy_slider_params.conv_index_to_value = function (index, slider) 
-                    {
-                        return index;//.toFloat() / 10.0;
-                    };
-
-                    curvy_slider_params.conv_value_to_index = function (value, slider)
-                    {
-                        return value;
-                        //var index = value * 10.0;
-                        //return index.toInt();
-                    };
-
-                    /*
-                    var normalize_index_type1 = [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5];
-                    var normalize_index_type2 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-                    var normalize_rank = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-                    var normalize_index_min_type1 = normalize_index_type1[0];
-                    var normalize_index_max_type1 = normalize_index_type1[normalize_index_type1.size - 1];
-                    var normalize_index_default_type1 = normalize_index_type1[normalize_index_type1.size / 2];
-
-                    var normalize_index_min_type2 = normalize_index_type2[0];
-                    var normalize_index_max_type2 = normalize_index_type2[normalize_index_type2.size - 1];
-                    var normalize_index_default_type2 = normalize_index_min_type2;
-
-                    var normalize_rank_min = normalize_rank[0];
-                    var normalize_rank_max = normalize_rank[normalize_rank.size - 1];
-                    var normalize_index_rank_pair_type1 = [ : ];
-
-                    for (var i = 0; i < normalize_index_type1.size && i < normalize_rank.size; i++)
-                    {
-                        normalize_index_rank_pair_type1[normalize_index_type1[i]] = normalize_rank[i];
-                    }
-
-                    var normalize_index_rank_pair_type2 = [ : ];
-
-                    for (var i = 0; i < normalize_index_type2.size && i < normalize_rank.size; i++)
-                    {
-                        normalize_index_rank_pair_type2[normalize_index_type2[i]] = normalize_rank[i];
-                    }
-                    */
-
                     var conv_index_to_value = function (index, slider) 
                     {
-                        return index;
-                        /*
-                        var rank = slider.norm_index_rank_pair[index.toInt()];
-                        var normalized_value = (rank.toFloat() - 1.0) / (normalize_rank_max.toFloat() - 1.0);
-                        var value = normalized_value + slider.norm_value_shift;
-                        return value;
-                        */
+                        return index.toFloat() / 10.0 + slider.norm_value_shift;
                     };
 
-                    var conv_value_to_index = function (value, slider) 
+                    var conv_value_to_index = function (value, slider)
                     {
-                        return value;
-                        /*
-                        var v = (value * 10.0) - (slider.norm_value_shift * 10.0);
-                        var index = slider.norm_index[v.toInt()];
-                        return index;
-                        */
+                        var index = ((value - slider.norm_value_shift) * 10.0);
+                        // note: adds small value so toInt doesn't break
+                        // original game fixed this by... having fixed value tables
+                        if (index > 0) {
+                            index += 0.1;
+                        } else {
+                            index -= 0.1;
+                        }
+                        return index.toInt();
                     };
+
+                    var curvy_slider_params = SliderParams();
+                    curvy_slider_params.value = 5;
+                    curvy_slider_params.original_range = [0, 10];
+                    curvy_slider_params.range = [-5, 10];
+                    curvy_slider_params.step = 1;
+                    curvy_slider_params.norm_value_shift = 0;
+                    curvy_slider_params.conv_index_to_value = conv_index_to_value;
+                    curvy_slider_params.conv_value_to_index = conv_value_to_index;
 
                     var width_slider_params = SliderParams();
-                    width_slider_params.value = 0.5;//normalize_index_default_type1;
-                    width_slider_params.original_range = [0.0, 1.0];
-                    width_slider_params.range = [-1.5, 5.0];//[normalize_index_min_type1, normalize_index_max_type1];
-                    width_slider_params.step = 0.1;//1;
-                    /*
-                    width_slider_params.norm_value_shift = 0.0;
-                    width_slider_params.norm_index = normalize_index_type1;
-                    width_slider_params.norm_index_rank_pair = normalize_index_rank_pair_type1;
-                    */
+                    width_slider_params.value = 5;
+                    width_slider_params.original_range = [0, 10];
+                    width_slider_params.range = [-10, 50];
+                    width_slider_params.step = 1;
+                    width_slider_params.norm_value_shift = 0;
                     width_slider_params.conv_index_to_value = conv_index_to_value;
                     width_slider_params.conv_value_to_index = conv_value_to_index;
 
                     var sharpness_slider_params = SliderParams();
-                    sharpness_slider_params.value = 0.5;//normalize_index_default_type1;
-                    sharpness_slider_params.original_range = [0.0, 1.0];
-                    sharpness_slider_params.range = [-1.0, 2.0];//[normalize_index_min_type1, normalize_index_max_type1];
-                    sharpness_slider_params.step = 0.1;//1;
-                    /*
-                    sharpness_slider_params.norm_value_shift = 0.0;
-                    sharpness_slider_params.norm_index = normalize_index_type1;
-                    sharpness_slider_params.norm_index_rank_pair = normalize_index_rank_pair_type1;
-                    */
+                    sharpness_slider_params.value = 5;
+                    sharpness_slider_params.original_range = [0, 10];
+                    sharpness_slider_params.range = [-10, 20];
+                    sharpness_slider_params.step = 1;
+                    sharpness_slider_params.norm_value_shift = 0;
                     sharpness_slider_params.conv_index_to_value = conv_index_to_value;
                     sharpness_slider_params.conv_value_to_index = conv_value_to_index;
-
 
                     var bank_angularitys = ROOT.model.get_basic_data(context, "bank_angularitys");
                     var bank_slider_params = SliderParams();
 
-                    bank_slider_params.value = (bank_angularitys[2]+5)/10;//normalize_index_type2[];
-                    bank_slider_params.original_range = [(bank_angularitys[0]+5)/10, (bank_angularitys[1]+5)/10];//[normalize_index_type2[], normalize_index_type2[bank_angularitys[1]]];
-                    bank_slider_params.range = [0.0, 2.0];
-                    bank_slider_params.step = 0.1;//1;
-                    /*
+                    bank_slider_params.value = (bank_angularitys[2]);
+                    bank_slider_params.original_range = [(bank_angularitys[0]), (bank_angularitys[1])];
+                    bank_slider_params.range = [-5, 15];
+                    bank_slider_params.step = 1;
                     bank_slider_params.norm_value_shift = 0.5;
-                    bank_slider_params.norm_index = normalize_index_type2;
-                    bank_slider_params.norm_index_rank_pair = normalize_index_rank_pair_type2;
-                    */
                     bank_slider_params.conv_index_to_value = conv_index_to_value;
                     bank_slider_params.conv_value_to_index = conv_value_to_index;
 
@@ -2583,12 +2530,14 @@ module ROOT
 
                 if (!slider.defined('norm_index'))
                 {
+                    // mm changes make this unused
                     slider.defineAttribute('norm_index');
                     slider.norm_index = param.args.norm_index;
                 }
 
                 if (!slider.defined('norm_index_rank_pair'))
                 {
+                    // mm changes make this unused
                     slider.defineAttribute('norm_index_rank_pair');
                     slider.norm_index_rank_pair = param.args.norm_index_rank_pair;
                 }
@@ -2607,6 +2556,7 @@ module ROOT
 
                 if (!slider.defined('original_range'))
                 {
+                    //mm: shows red outside of this range for non-common sliders
                     slider.defineAttribute('original_range');
                     slider.original_range = param.args.original_range;
                 }
@@ -2630,6 +2580,16 @@ module ROOT
                 {
                     module (slider)
                     {
+                        //mm: outside original range displays in red
+                        method onValueChanged(context)
+                        {
+                            self.sliderValueChanged(context);
+                            if (self.original_range != nil)
+                            {
+                                self['popup'].Value.label.color = (self.value < self.original_range[0] || self.value > self.original_range[1]) ? ROOT.sSliderRedColor : ROOT.sSliderValueColor;
+                            }
+                        }
+
                         method onPopupOpen(context)
                         {
                             self.sliderPopupOpen(context);
@@ -2637,6 +2597,11 @@ module ROOT
 
                             if (state & 0x100)
                                 ROOT.model.select_all_sections(context);
+
+                            if (self.original_range != nil)
+                            {
+                                self['popup'].Value.label.color = (self.value < self.original_range[0] || self.value > self.original_range[1]) ? ROOT.sSliderRedColor : ROOT.sSliderValueColor;
+                            }
 
                             return EVENTRESULT_CONTINUE;
                         }
@@ -2674,6 +2639,11 @@ module ROOT
                 try
                 {
                     var v = slider.conv_index_to_value != nil ? slider.conv_index_to_value(value, slider) : value;
+
+                    if (slider.original_range != nil)
+                    {
+                        slider.label.color = (slider.value < slider.original_range[0] || slider.value > slider.original_range[1]) ? ROOT.sSliderRedColor : ROOT.sSliderValueColor;
+                    }
 
                     if (self.is_common)
                     {
@@ -2730,6 +2700,11 @@ module ROOT
 
                     slider.index = v;
                     slider.reflect(context);
+
+                    if (slider.original_range != nil)
+                    {
+                        slider.label.color = (slider.value < slider.original_range[0] || slider.value > slider.original_range[1]) ? ROOT.sSliderRedColor : ROOT.sSliderValueColor;
+                    }
                 }
                 catch (e)
                 {
