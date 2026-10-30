@@ -437,6 +437,8 @@ module BootProjectUtil
                 {
                     var valid = true;
 
+                    //mm: don't validate that DLC cars are player owned in suspended race
+                    /*
                     {
                         var garage = GAME_STATUS.user_profile.garage;
                         var entry_set = GAME_STATUS.user_profile.suspender.gp.event.entry_set;
@@ -456,6 +458,7 @@ module BootProjectUtil
                             }
                         }
                     }
+                    */
 
 
                     if (valid)
