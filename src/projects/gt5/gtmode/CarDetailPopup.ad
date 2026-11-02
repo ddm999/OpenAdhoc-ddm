@@ -380,7 +380,7 @@ module ROOT
 
     function checkDebugCommand(context)
     {
-        if (pdiext::isQABuild())
+        if (true /*pdiext::isQABuild()*/)
         {
             var state = context.getUpdateContext().getPadButtonState(0);
             if (state & 0x800)

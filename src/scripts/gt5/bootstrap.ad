@@ -285,7 +285,7 @@ function initNetwork()
     main::PDINetwork.setNPTitleID(title_id);
 
     var service_id = main::pdiext::MProductInformation::GetServiceID();
-    if (pdiext::isQABuild())
+    if (true /*pdiext::isQABuild()*/)
     {
         var path = "/APP_USB/ServiceID.txt";
         if (pdistd::Exist(path))

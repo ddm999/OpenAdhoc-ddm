@@ -1320,7 +1320,7 @@ module ROOT::GameDetail
     {
         var status = EVENTRESULT_CONTINUE;
 
-        if (pdiext::isQABuild() && event.keysym == CELL_PAD_CTRL_START)
+        if (true /*pdiext::isQABuild()*/ && event.keysym == CELL_PAD_CTRL_START)
         {
             sound.play("next");
             |var event_id, var event_index, var is_championship| = candidate_data.value_;

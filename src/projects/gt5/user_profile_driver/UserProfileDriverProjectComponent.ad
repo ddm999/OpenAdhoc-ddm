@@ -707,7 +707,7 @@ module UserProfileDriverProjectComponent::FinderItem::BspecDriverL
             var result_text = context.translate(context.getRootWindow(), "Driver", "RESULT_FORMAT").build(dp.growth_parameter.win_count, dp.growth_parameter.race_count);
             Body::Result::TextFace.text = result_text;
 
-            if (pdiext::isQABuild())
+            if (true /*pdiext::isQABuild()*/)
             {
                 Body::Debug.visible = true;
 

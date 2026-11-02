@@ -596,7 +596,7 @@ module ROOT
 
     function checkDebugCommand(context)
     {
-        if (pdiext::isQABuild())
+        if (true /*pdiext::isQABuild()*/)
         {
             var state = context.getUpdateContext().getPadButtonState(0);
 
@@ -1174,7 +1174,7 @@ module ROOT::CarDetail
                 status = EVENTRESULT_STOP;
         }
 
-        if (pdiext::isQABuild() && event.keysym == CELL_PAD_CTRL_START)
+        if (true /*pdiext::isQABuild()*/ && event.keysym == CELL_PAD_CTRL_START)
         {
             ROOT.buyUsedCar(context, self.cp_, self.price_, self.sold_out_, self.new_flag_, self.seed_, self.min_seed_, true);
             return EVENTRESULT_FILTER;

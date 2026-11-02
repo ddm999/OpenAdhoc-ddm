@@ -72,7 +72,7 @@ function execBootPhase2()
     startMenuSystem();
     initResidentProject();
 
-    if (pdiext::isQABuild())
+    if (true /*pdiext::isQABuild()*/)
     {
         var lang = pdistd::MLocale::getLanguage();
         var path = "/APP_USB/%{lang}.rt2";

@@ -406,7 +406,7 @@ module LicenseRoot::CategorySelect
 
     method onKeyPress(context, event)
     {
-        if (pdiext::isQABuild() && event.keysym == CELL_PAD_CTRL_START)
+        if (true /*pdiext::isQABuild()*/ && event.keysym == CELL_PAD_CTRL_START)
         {
             main::sound.play("next");
 
@@ -801,7 +801,7 @@ module LicenseRoot::LicenseSelect
 
     method cb_on_key_press_license(context, event, item_w, candidate_data)
     {
-        if (pdiext::isQABuild() && event.keysym == CELL_PAD_CTRL_START)
+        if (true /*pdiext::isQABuild()*/ && event.keysym == CELL_PAD_CTRL_START)
         {
             main::sound.play("next");
 

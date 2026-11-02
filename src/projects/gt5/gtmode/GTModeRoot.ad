@@ -2639,7 +2639,7 @@ module GTModeRoot
 
                     PROJECT.history['GTModeRoot::FocusWidgetName'] = self.getNodePath(PROJECT::ROOT);
 
-                    if (pdiext::isQABuild())
+                    if (true /*pdiext::isQABuild()*/)
                         OfficialEventsRoot.open(context);
                     else
                         DialogUtil::openConfirmDialog(context, DialogUtil::ERROR, context.translate(ROOT, "THIS_CANNOT_BE_SELECTED"));

@@ -1451,7 +1451,7 @@ module ROOT::ColorSelect
             return EVENTRESULT_FILTER;
         }
 
-        if (pdiext::isQABuild() && event.keysym == CELL_PAD_CTRL_TRIANGLE)
+        if (true /*pdiext::isQABuild()*/ && event.keysym == CELL_PAD_CTRL_TRIANGLE)
         {
             if (self.car_code_ == nil)
                 return EVENTRESULT_CONTINUE;

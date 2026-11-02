@@ -105,7 +105,7 @@ module ROOT
         self.isJPTW = language == "JP" || language == "TW";
 
         self.format_no = context.translate(ROOT, "Number", "FORMAT_NO");
-        self.isQABuild = pdiext::isQABuild();
+        self.isQABuild = true /*pdiext::isQABuild()*/;
 
         self.museum_cache = Map();
         self.count_cache = Map();

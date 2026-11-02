@@ -509,8 +509,8 @@ function execBootPhase3_step4(context, progress)
     vacuumIf(context);
     loadVoucherData(context);
 
-    if (GetVersionBranch() != "runviewer")
-        DLCUtil::checkOnBoot(context);
+    //if (GetVersionBranch() != "runviewer")
+    //    DLCUtil::checkOnBoot(context);
 
     var space = pdistd::GetDiskFreeSize("/APP_DATA");
     var MB32 = 32 * 1024 * 1024;

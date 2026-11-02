@@ -104,7 +104,7 @@ module ROOT
     method onInitialize(context)
     {
         Popup::Pane::Body::Name::Header::TextFace.text = self.user_id;
-        Popup::Pane::Body::Name::AnyUser.visible = pdiext::isQABuild();
+        Popup::Pane::Body::Name::AnyUser.visible = true /*pdiext::isQABuild()*/;
 
         Popup::Pane::Body::Comment::TextFace.text = "%s %s".format (
             context.translate(ROOT, "MyHome", "COMMENT"),

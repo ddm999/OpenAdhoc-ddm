@@ -1145,7 +1145,7 @@ module ROOT::GameSelect
             status = EVENTRESULT_STOP;
         }
 
-        if (pdiext::isQABuild() && event.keysym == CELL_PAD_CTRL_START)
+        if (true /*pdiext::isQABuild()*/ && event.keysym == CELL_PAD_CTRL_START)
         {
             main::sound.play("return");
 

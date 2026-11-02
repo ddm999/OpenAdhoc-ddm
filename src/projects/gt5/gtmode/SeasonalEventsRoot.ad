@@ -151,7 +151,7 @@ module ROOT
 
     method onKeyPress(context, event)
     {
-        if (pdiext::isQABuild())
+        if (true /*pdiext::isQABuild()*/)
         {
             if (event.keysym == CELL_PAD_CTRL_START)
             {
@@ -676,7 +676,7 @@ module ROOT
 
             if (!self.having_right)
             {
-                if (sCheatRegistered && pdiext::isQABuild())
+                if (sCheatRegistered && true /*pdiext::isQABuild()*/)
                 {
                     self.having_right = true;
 
