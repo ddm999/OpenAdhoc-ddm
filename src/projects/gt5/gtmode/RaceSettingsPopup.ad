@@ -64,6 +64,15 @@ module ROOT
         OptionMenuUtil::initialize(context, ROOT, Pane::StartType::OptionMenu, hidden::OptionMenuItem, start_type_list, "Regulation");
         Pane::StartType::OptionMenu.setIndex(context, start_type_def == 0 ? start_type_def : start_type_def - 1);
 
+        var consumption_def = getDefault(sGP, "Consumption");
+        var consumption_list = ["CONSUMPTION_OFF", "CONSUMPTION_ON"];
+        if (consumption_def == 0)
+            consumption_list.unshift("UNCHANGED");
+        else
+            consumption_list[consumption_def-1] = consumption_list[consumption_def-1]+"_UNCHANGED";
+        OptionMenuUtil::initialize(context, ROOT, Pane::Consumption::OptionMenu, hidden::OptionMenuItem, consumption_list, "Regulation");
+        Pane::Consumption::OptionMenu.setIndex(context, consumption_def == 0 ? consumption_def : consumption_def - 1);
+
         var low_mu_def = getDefault(sGP, "LowMuType");
         var low_mu_list = ["LOW_MU_TYPE_MODERATE", "LOW_MU_TYPE_REAL"];
         if (low_mu_def == 0)
@@ -92,6 +101,7 @@ module ROOT
         OptionMenuUtil::finalize(context, Pane::LapMult::OptionMenu);
         OptionMenuUtil::finalize(context, Pane::TimeMult::OptionMenu);
         OptionMenuUtil::finalize(context, Pane::StartType::OptionMenu);
+        OptionMenuUtil::finalize(context, Pane::Consumption::OptionMenu);
         OptionMenuUtil::finalize(context, Pane::LowMuType::OptionMenu);
         OptionMenuUtil::finalize(context, Pane::Damage::OptionMenu);
         OptionMenuUtil::finalize(context, Pane::AIPremium::OptionMenu);
@@ -248,6 +258,39 @@ module ROOT
                 }
                 break;
 
+            case "Consumption":
+                for (var i = 0; i < gp.events.size; i++)
+                {
+                    if (value == nil)
+                    {
+                        value = gp.events[i].race_parameter.consume_fuel;
+                    }
+                    else if (value != gp.events[i].race_parameter.consume_fuel)
+                    {
+                        return 0;
+                    }
+
+                    if (value != gp.events[i].race_parameter.consume_tire)
+                    {
+                        return 0;
+                    }
+                }
+                switch (value)
+                {
+                    case false:
+                        index = 1;
+                        break;
+
+                    case true:
+                        index = 2;
+                        break;
+
+                    default:
+                        index = 0;
+                        break;
+                }
+                break;
+
             case "LowMuType":
                 for (var i = 0; i < gp.events.size; i++)
                 {
@@ -332,6 +375,13 @@ module ROOT
         else
             Pane::StartType::OptionMenu.setIndex(context, start_type_def == 0 ? 0 : start_type_def - 1);
 
+        var consumption_def = getDefault(gp, "Consumption");
+        var consumption_val = PROJECT.history["RaceSettingsPopup::Consumption"];
+        if (consumption_val > 0)
+            Pane::Consumption::OptionMenu.setIndex(context, consumption_def == 0 ? consumption_val : consumption_val - 1);
+        else
+            Pane::Consumption::OptionMenu.setIndex(context, consumption_def == 0 ? 0 : consumption_def - 1);
+
         var low_mu_def = getDefault(gp, "LowMuType");
         var low_mu_val = PROJECT.history["RaceSettingsPopup::LowMuType"];
         if (low_mu_val > 0)
@@ -404,6 +454,28 @@ module ROOT
                     case 3:
                         gp.events[i].race_parameter.start_type = gtengine::StartType::ROLLING_DL;
                         gp.events[i].race_parameter.time_to_start = 10000;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        var consumption_type = PROJECT.history["RaceSettingsPopup::Consumption"];
+        if (consumption_type != nil && consumption_type > 0)
+        {
+            for (var i = 0; i < gp.events.size; i++)
+            {
+                switch (consumption_type)
+                {
+                    case 1:
+                        gp.events[i].race_parameter.consume_fuel = false;
+                        gp.events[i].race_parameter.consume_tire = false;
+                        break;
+                    case 2:
+                        gp.events[i].race_parameter.consume_fuel = true;
+                        gp.events[i].race_parameter.consume_tire = true;
+                        gp.events[i].race_parameter.enable_pit = true;
                         break;
                     default:
                         break;
@@ -509,6 +581,10 @@ module ROOT
         var start_type_val = Pane::StartType::OptionMenu.index + (start_type_def == 0 ? 0 : 1);
         PROJECT.history["RaceSettingsPopup::StartType"] = start_type_val == start_type_def ? 0 : start_type_val;
 
+        var consumption_def = getDefault(sGP, "Consumption");
+        var consumption_val = Pane::Consumption::OptionMenu.index + (consumption_def == 0 ? 0 : 1);
+        PROJECT.history["RaceSettingsPopup::Consumption"] = consumption_val == consumption_def ? 0 : consumption_val;
+
         var low_mu_def = getDefault(sGP, "LowMuType");
         var low_mu_val = Pane::LowMuType::OptionMenu.index + (low_mu_def == 0 ? 0 : 1);
         PROJECT.history["RaceSettingsPopup::LowMuType"] = low_mu_val == low_mu_def ? 0 : low_mu_val;
@@ -530,6 +606,7 @@ module ROOT
         PROJECT.history["RaceSettingsPopup::PlayerPos"] = 0;
         Pane::PlayerPos::slider.index = PROJECT.history["RaceSettingsPopup::PlayerPos"];
         PROJECT.history["RaceSettingsPopup::StartType"] = 0;
+        PROJECT.history["RaceSettingsPopup::Consumption"] = 0;
         PROJECT.history["RaceSettingsPopup::LowMuType"] = 0;
         PROJECT.history["RaceSettingsPopup::Damage"] = 0;
         PROJECT.history["RaceSettingsPopup::AIPremium"] = 0;
