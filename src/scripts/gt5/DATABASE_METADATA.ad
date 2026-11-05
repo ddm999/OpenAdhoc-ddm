@@ -39,12 +39,12 @@
 #define BSPEC_DATA_PATH             "textdata/gt5/bspec_driver_list.xml"
 
 // Car List (CarData.ad)
-#define CAR_DATA_VERSION            1312
+#define CAR_DATA_VERSION            1313
 #define CAR_TABLE_NAME              "t_car_data"
 #define CAR_DATA_PATH               "textdata/gt5/carlist.xml"
 
 // Course List (CourseData.ad)
-#define COURSE_DATA_VERSION         2060
+#define COURSE_DATA_VERSION         2061
 #define COURSE_TABLE_NAME           "t_course_data"
 #define COURSE_DATA_PATH            "textdata/gt5/courselist.xml"
 
