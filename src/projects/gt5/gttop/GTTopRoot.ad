@@ -36,7 +36,7 @@ module GTTopRoot
             [ButtonHelpGT5.getCancelButtonName(), context.translate(ROOT, "Component", "Cancel")],
         ]);
 
-        if (gDebugScenes)
+        if (PROJECT.history['GTModeRoot::DebugScenes'] == true)
             Upper::debug.visible = true;
         else
             Upper::debug.visible = false;
@@ -254,10 +254,26 @@ module GTTopRoot
                 scene_alias = "grandtop_intro";
             else
             {
-                if (!GAME_STATUS.user_profile.game_flags.getFlag("TOP_SCENES", "allavt_topdemo") && !gDebugScenes)
+                //mm: just always force default scenes on to stop debug nonsense happening after reboot
+                if (!PROJECT.history['GTModeRoot::DebugScenes'])
                 {
-                    scene_alias = "allavt_topdemo";
-                    GAME_STATUS.user_profile.game_flags.setFlag("TOP_SCENES", "allavt_topdemo", true);
+                    var default_flags = [
+                        "top_redbullhangar7",
+                        "top_shirakawa",
+                        "top_GTR_engine",
+                        "top_ahrweiler01",
+                        "top_DarkHangar01",
+                        "top_new_nur",
+                        "top_DarkSmoke_01",
+                        "top_new_bonn",
+                        "top_kiritooshi_new",
+                        "top_whiteTown",
+                        "allavt_topdemo",
+                        "top_garage",
+                    ];
+
+                    foreach (var flag in default_flags)
+                        GAME_STATUS.user_profile.game_flags.setFlag("TOP_SCENES", flag, true);
                 }
             }
         }
@@ -423,7 +439,7 @@ module GTTopRoot
                 index = (index + 1) % n;
                 GAME_STATUS.user_profile.context.top_scene_index = index;
 
-                if (gDebugScenes)
+                if (PROJECT.history['GTModeRoot::DebugScenes'] == true)
                     scene_alias = scene_list[index];
                 else
                     scene_alias = scene_list[sequence[index]];

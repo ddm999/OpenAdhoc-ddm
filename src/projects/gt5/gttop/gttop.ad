@@ -24,8 +24,6 @@ module GTTopProject
     static additional_projects;
     static additional_sounds;
 
-    static gDebugScenes = false;
-
     function onLoad(update_context)
     {
         update_context.createRenderContext(1);
@@ -44,6 +42,7 @@ module GTTopProject
                 ['OnlineTopRoot::SelectIndex', 0],
                 ['PhotoTravelRoot::FocusIndex', 0],
                 ['isNeedVacuum', true],
+                ['GTModeRoot::DebugScenes', false],
             ]);
         }
 

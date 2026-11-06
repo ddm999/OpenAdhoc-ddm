@@ -1756,7 +1756,7 @@ module DebugMenuPopup::Template::ScrolledWindow::clip::space::TopSceneDebug::Exe
         else
             GAME_STATUS.user_profile.game_flags.setFlag("TOP_SCENES_EXTRA", next_scene, true);
 
-        gDebugScenes = true;
+        PROJECT.history['GTModeRoot::DebugScenes'] = true;
 
         PleaseWait.end(context);
 
