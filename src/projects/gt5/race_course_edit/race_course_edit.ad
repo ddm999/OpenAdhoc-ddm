@@ -89,14 +89,14 @@ module PROJECT
 
                 "template04" : [
                     //mm: Eifel Alternate: use template05 details
-                    [course_type_circuit], [weather_sunny, weather_rainy], [], [], [],
+                    [course_type_circuit, course_type_rally], [weather_sunny, weather_rainy], [], [], [],
                     ["6:00", "18:00", "7:00"], [], [], 
                     [["gtr_07", 1], ["is_f_racing_concept_08", 0], ["arta_garaiya_08", 0]],
                     [], [], seed_type_sequence, 100
                 ],
 
                 "template05" : [
-                    [course_type_circuit], [weather_sunny, weather_rainy], [], [], [],
+                    [course_type_circuit, course_type_rally], [weather_sunny, weather_rainy], [], [], [],
                     ["6:00", "18:00", "7:00"], [], [], 
                     [["gtr_07", 1], ["is_f_racing_concept_08", 0], ["arta_garaiya_08", 0]],
                     [], [], seed_type_sequence, 100
@@ -187,7 +187,7 @@ module PROJECT
 
                 "template16" : [
                     //mm: Eifel Alternate UK1609: use template05 details
-                    [course_type_circuit], [weather_sunny, weather_rainy], [], [], [],
+                    [course_type_circuit, course_type_rally], [weather_sunny, weather_rainy], [], [], [],
                     ["6:00", "18:00", "7:00"], [], [], 
                     [["gtr_07", 1], ["is_f_racing_concept_08", 0], ["arta_garaiya_08", 0]],
                     [], [], seed_type_sequence, 100
@@ -195,7 +195,7 @@ module PROJECT
 
                 "template17" : [
                     //mm: Eifel UK1609: use template05 details
-                    [course_type_circuit], [weather_sunny, weather_rainy], [], [], [],
+                    [course_type_circuit, course_type_rally], [weather_sunny, weather_rainy], [], [], [],
                     ["6:00", "18:00", "7:00"], [], [], 
                     [["gtr_07", 1], ["is_f_racing_concept_08", 0], ["arta_garaiya_08", 0]],
                     [], [], seed_type_sequence, 100
