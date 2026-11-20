@@ -1514,7 +1514,7 @@ module ROOT
         tuner_list.sort();
         tuner_list.unshift("---");
 
-        OptionMenuUtil::initialize(context, CarRoot, option_menu, hidden::OptionMenuItem, tuner_list, "TunerNameI18n");
+        OptionMenuUtil::initialize(context, CarRoot, option_menu, hidden::OptionMenuItem, tuner_list, "TunerName");
         self.filter_tuner_index = 0;
         option_menu.setIndex(context, self.filter_tuner_index);
     }
