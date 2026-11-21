@@ -256,7 +256,7 @@ module ROOT
         hidden::IconItem::ImageFace.image_path = "";
         hidden::WheelItem::ImageFace.image_path = "";
         ROOT::Each::RacingModify::Flyer::image01.image_path = "";
-        ROOT::Each::RacingModify::Flyer::image01.image_path = ""; // BUG: Dupe?
+        ROOT::Each::RacingModify::Flyer::image02.image_path = "";
     }
 
     method postInitialize(context)
@@ -426,7 +426,7 @@ module ROOT
         GAME_STATUS.user_profile.context.need_save = SaveDataUtilGT5::STATUSCODE::NEED_SAVE;
     }
 
-    function PayMoney(context, wages, coupon_name)
+    function PayMoney(context, wages, coupon_name, bypass_fail=false)
     {
         var mycash = &main::GAME_STATUS.user_profile.cash;
         if (coupon_name != nil)
@@ -460,10 +460,14 @@ module ROOT
                 return false;
         }
 
-        if (*mycash >= wages)
+        //mm: hold R1 to get stuff free!
+        var state = context.getUpdateContext().getPadButtonState(0);
+        if (*mycash >= wages || state & 0x800)
         {
             main::sound.play("buy_shop");
-            *mycash -= wages;
+
+            if (!(state & 0x800))
+                *mycash -= wages;
 
             ROOT::HeaderGT5::HBox::Credits.refresh();
             GAME_STATUS.user_profile.context.need_save = SaveDataUtilGT5::STATUSCODE::NEED_SAVE;
@@ -472,6 +476,11 @@ module ROOT
         }
         else
         {
+            if (bypass_fail)
+            {
+                main::sound.play("buy_shop");
+                return true;
+            }
             main::sound.play("disable");
             DialogUtil::openConfirmDialog(context, DialogUtil::ERROR, 
             context.translate(ROOT, "MESSAGE_NOT_ENOUGH_CREDITS"));
@@ -582,12 +591,23 @@ module ROOT
         var have_paid = ROOT::PayMoney(context, ROOT::sWagesList.wash_car, coupon_name);
         if (!have_paid)
             return;
+            
+        var skip_anim = false;
+        var state = context.getUpdateContext().getPadButtonState(0);
+        if (state & 0x100)
+            skip_anim = true;
 
         context.cursor_visible = false;
         context.event_mask = 5;
         context.disableInput();
         ROOT::Each.hide(context, false);
         ROOT::Menus.hide(context, false);
+
+        if (skip_anim)
+        {
+            end_wash_car(context);
+            return;
+        }
 
         var scene_settings = ROOT::SceneFace::SceneSettings(end_wash_car, nil, nil, nil, nil, "sound_gt/gt5/gtauto/gtauto_wash");
         var is_racing_kart = gtengine::MSpecDB::checkGenericFlag("is_racing_kart", sRidingCar.getCarCode());
@@ -709,6 +729,11 @@ module ROOT
         if (!have_paid)
             return;
 
+        var skip_anim = false;
+        var state = context.getUpdateContext().getPadButtonState(0);
+        if (state & 0x100)
+            skip_anim = true;
+
         context.cursor_visible = false;
         context.event_mask = 5;
         context.disableInput();
@@ -716,6 +741,14 @@ module ROOT
         ROOT::PP_PS_Change.hide(context, false);
         ROOT::Each.hide(context, false);
         ROOT::Menus.hide(context, false);
+
+        if (skip_anim)
+        {
+            ROOT::OilGauge::Gauge::old.opacity = 0.0;
+            ROOT::OilGauge::Gauge::old_6000.opacity = 0.0;
+            end_change_oil(context);
+            return;
+        }
 
         var scene;
         var car_code = ROOT::sRidingCar.getCarCode();
@@ -781,16 +814,6 @@ module ROOT
 
     function on_paint_body(context, focus_index)
     {
-        var can_all_paint = gtengine::MSpecDB::checkGenericFlag("can_all_paint", sRidingCar.getCarCode());
-        if (!can_all_paint)
-        {
-            main::sound.play("disable");
-            ROOT::MessageArea::MessageWindow::FadeActor.reset();
-
-            DialogUtil::openConfirmDialog(context, DialogUtil::ERROR, context.translate(ROOT, "MESSAGE_THIS_CAR_CANNOT_BODY_PAINT"));
-            return;
-        }
-
         var paint_item_count = GameItemUtil::ItemBox::getNumByCategory(gtengine::GameItemCategory::PAINT_ITEM);
         if (paint_item_count == 0)
         {
@@ -801,8 +824,43 @@ module ROOT
             return;
         }
 
+        var can_all_paint = gtengine::MSpecDB::checkGenericFlag("can_all_paint", sRidingCar.getCarCode());
+        var state = context.getUpdateContext().getPadButtonState(0);
+        if (!can_all_paint && !(state & 0x100)) //mm: hold L1 to auto-accept
+        {
+            main::sound.play("disable");
+            ROOT::MessageArea::MessageWindow::FadeActor.reset();
+
+            var result = DialogUtil::openConfirmDialog(context, DialogUtil::YESNO,
+                context.translate(ROOT, "MESSAGE_THIS_CAR_CANNOT_BODY_PAINT")+
+                "\n\nMaster Mod: Select Yes to do it anyway!");
+            if (!result)
+                return;
+        }
+
         main::sound.play("ok");
         ROOT::sShopFrontFocus = focus_index;
+
+        ROOT::SceneFace.execCommand("setCarVariation 0 bodycolor");
+        ROOT::SceneFace.execCommand("swapCarExtraColor -1 -1 -1 -1 bodycolor");
+
+        var hbox = ROOT::Each::PaintBody::PaintColor::HBox;
+        hbox.ColorTip::ColorChipFace.setCarColor("car_color_sample", 0);
+        hbox.color_name.text = context.translate(ROOT, "UNSETTING_PAINT_COLOR");
+
+        ROOT::SceneFaceCover.setVisible("Default");
+        ROOT::SceneFace.startSceneScript(context, "GT_AUTO_bodypaint_preview");
+        ROOT::MyHome.hide(context, false);
+        ROOT::Each.appear(context, "PaintBody", false);
+        ROOT::Menus.swapMenuIcons(context, PaintBodyMenus);
+    }
+
+    function on_paint_body_revert(context, focus_index)
+    {
+        main::sound.play("cancel");
+
+        var actual_paint_id = sRidingCar.getPaintColor(0);
+        ROOT::SceneFace.execCommand("swapCarExtraColor %{actual_paint_id} -1 -1 -1 car1");
 
         ROOT::SceneFace.execCommand("setCarVariation 0 bodycolor");
         ROOT::SceneFace.execCommand("swapCarExtraColor -1 -1 -1 -1 bodycolor");
@@ -852,19 +910,47 @@ module ROOT
         var color_name = sPaintItem.item_name;
 
         main::sound.play("ok");
-        var accept = DialogUtil::openConfirmDialog(context, DialogUtil::YESNO, context.translate(ROOT, "MESSAGE_DO_YOU_TRY_BODY_PAINT").build(color_name));
-        if (!accept)
-            return;
 
+        var state = context.getUpdateContext().getPadButtonState(0);
+        if (!(state & 0x100)) //mm: hold L1 to skip dialog
+        {
+            var accept = DialogUtil::openConfirmDialog(context, DialogUtil::YESNO,
+                context.translate(ROOT, "MESSAGE_DO_YOU_TRY_BODY_PAINT").build(color_name)+
+                "\n\nMaster Mod: You can revert to keep\nyour Paint Item if you don't like the result.");
+            if (!accept)
+                return;
+        }
+
+        //mm: only pay on application
+        /*
         var have_paid = ROOT::PayMoney(context, ROOT::sWagesList.paint_body);
         if (!have_paid)
             return;
+        */
+        state = context.getUpdateContext().getPadButtonState(0);
+        if (main::GAME_STATUS.user_profile.cash < ROOT::sWagesList.paint_body && !(state & 0x800)) //mm: hold R1 to do it for free!!
+        {
+            main::sound.play("disable");
+            DialogUtil::openConfirmDialog(context, DialogUtil::ERROR, 
+            context.translate(ROOT, "MESSAGE_NOT_ENOUGH_CREDITS"));
+        }
+
+        var skip_anim = false;
+        if (state & 0x100)
+            skip_anim = true;
 
         context.cursor_visible = false;
         context.event_mask = 5;
         context.disableInput();
         ROOT::Each.hide(context, false);
         ROOT::Menus.hide(context, false);
+
+        if (skip_anim)
+        {
+            ROOT::SceneFace.execCommand("setVisible false bodycolor");
+            end_paint_body(context);
+            return;
+        }
 
         if (gtengine::MSpecDB::getPaintColorType(color_id) == 3)
         {
@@ -891,40 +977,41 @@ module ROOT
     function end_paint_body(context)
     {
         var color_id = sPaintItem.argument1;
-        var color_name = sPaintItem.item_name;
         ROOT::SceneFace.execCommand("setCarVariationExtra 0 car1");
         ROOT::SceneFace.execCommand("swapCarExtraColor %{color_id} -1 -1 -1 car1");
 
-        ROOT::sRidingCar.setPaintColor(0, color_id);
-        ROOT::sRidingCar.rainX = 0.0;
-        ROOT::sRidingCar.dirtiness = 0.0;
-        ROOT::UpdateRidingCar();
-        GameItemUtil::ItemBox::delete2(ROOT::sPaintItem);
-
-        ROOT::sPaintItem = nil;
-        ROOT::sNeedCapture = true;
-        ROOT::sNeedCleanDirtiness = true;
-
-        ROOT::Menus.setMenuIcons(context, BackMenus);
+        ROOT::Menus.setMenuIcons(context, PaintBodyRevertBackMenu);
         ROOT::Menus.appear(context, false);
         context.event_mask = 5;
         context.enableInput();
         context.cursor_visible = true;
     }
 
+    function apply_paint_body(context)
+    {
+        //mm: shenanigans here to make it so if you skipped the money check before, nothing goes weird
+        ROOT::PayMoney(context, ROOT::sWagesList.paint_body, nil, true);
+
+        var color_id = sPaintItem.argument1;
+        ROOT::sRidingCar.setPaintColor(0, color_id);
+        ROOT::sRidingCar.rainX = 0.0;
+        ROOT::sRidingCar.dirtiness = 0.0;
+        ROOT::UpdateRidingCar();
+
+        //mm: hold R1, no paint usage
+        var state = context.getUpdateContext().getPadButtonState(0);
+        if (!(state & 0x800))
+            GameItemUtil::ItemBox::delete2(ROOT::sPaintItem);
+
+        ROOT::sPaintItem = nil;
+        ROOT::sNeedCapture = true;
+        ROOT::sNeedCleanDirtiness = true;
+
+        ROOT::go_shop_front(context);
+    }
+
     function on_paint_wheels(context, focus_index)
     {
-        var car_label = sRidingCar.getCarLabel();
-        var is_rm_car = car_label.endWith("_rm");
-        if (!is_rm_car && sRidingCar.wheel == 0)
-        {
-            main::sound.play("disable");
-            ROOT::MessageArea::MessageWindow::FadeActor.reset();
-            DialogUtil::openConfirmDialog(context, DialogUtil::ERROR, context.translate(ROOT, "MESSAGE_THIS_CAR_CANNOT_WHEELS_PAINT"));
-
-            return;
-        }
-
         var paint_item_count = GameItemUtil::ItemBox::getNumByCategory(gtengine::GameItemCategory::PAINT_ITEM);
         if (paint_item_count == 0)
         {
@@ -935,8 +1022,44 @@ module ROOT
             return;
         }
 
+        var car_label = sRidingCar.getCarLabel();
+        var is_rm_car = car_label.endWith("_rm");
+        var state = context.getUpdateContext().getPadButtonState(0);
+        if (!is_rm_car && sRidingCar.wheel == 0 && !(state & 0x100)) //mm: hold L1 to auto-accept
+        {
+            main::sound.play("disable");
+            ROOT::MessageArea::MessageWindow::FadeActor.reset();
+
+            var result = DialogUtil::openConfirmDialog(context, DialogUtil::YESNO,
+                context.translate(ROOT, "MESSAGE_THIS_CAR_CANNOT_WHEELS_PAINT")+
+                "\n\nMaster Mod: Select Yes to do it anyway!");
+            if (!result)
+                return;
+        }
+
         main::sound.play("ok");
         ROOT::sShopFrontFocus = focus_index;
+        ROOT::SceneFace.execCommand("setCarVariation 0 wheelcolor");
+        ROOT::SceneFace.execCommand("swapCarExtraColor -1 -1 -1 -1 wheelcolor");
+
+        var hbox = ROOT::Each::PaintWheels::PaintColor::HBox;
+        hbox.ColorTip::ColorChipFace.setCarColor("wheel_color_sample", 0);
+        hbox.color_name.text = context.translate(ROOT, "UNSETTING_PAINT_COLOR");
+        ROOT::SceneFaceCover.setVisible("Default");
+        ROOT::SceneFace.startSceneScript(context, "GT_AUTO_wheel_paint_preview");
+
+        ROOT::MyHome.hide(context, false);
+        ROOT::Each.appear(context, "PaintWheels", false);
+        ROOT::Menus.swapMenuIcons(context, PaintWheelsMenus);
+    }
+
+    function on_paint_wheels_revert(context, focus_index)
+    {
+        main::sound.play("cancel");
+
+        var actual_paint_id = sRidingCar.getWheelPaintColor(0);
+        ROOT::SceneFace.execCommand("swapCarWheelExtraColor %{actual_paint_id} -1 -1 -1 car1");
+
         ROOT::SceneFace.execCommand("setCarVariation 0 wheelcolor");
         ROOT::SceneFace.execCommand("swapCarExtraColor -1 -1 -1 -1 wheelcolor");
 
@@ -983,19 +1106,47 @@ module ROOT
         var color_name = sPaintItem.item_name;
 
         main::sound.play("ok");
-        var accept = DialogUtil::openConfirmDialog(context, DialogUtil::YESNO, context.translate(ROOT, "MESSAGE_DO_YOU_TRY_WHEELS_PAINT").build(color_name));
-        if (!accept)
-            return;
 
+        var state = context.getUpdateContext().getPadButtonState(0);
+        if (!(state & 0x100)) //mm: hold L1 to skip dialog
+        {
+            var accept = DialogUtil::openConfirmDialog(context, DialogUtil::YESNO,
+                context.translate(ROOT, "MESSAGE_DO_YOU_TRY_WHEELS_PAINT").build(color_name)+
+                "\n\nMaster Mod: You can revert to keep\nyour Paint Item if you don't like the result.");
+            if (!accept)
+                return;
+        }
+
+        //mm: only pay on application
+        /*
         var have_paid = ROOT::PayMoney(context, ROOT::sWagesList.paint_wheels);
         if (!have_paid)
             return;
+        */
+        state = context.getUpdateContext().getPadButtonState(0);
+        if (main::GAME_STATUS.user_profile.cash < ROOT::sWagesList.paint_wheels && !(state & 0x800)) //mm: hold R1 to do it for free!!
+        {
+            main::sound.play("disable");
+            DialogUtil::openConfirmDialog(context, DialogUtil::ERROR, 
+            context.translate(ROOT, "MESSAGE_NOT_ENOUGH_CREDITS"));
+        }
+
+        var skip_anim = false;
+        if (state & 0x100)
+            skip_anim = true;
 
         context.cursor_visible = false;
         context.event_mask = 5;
         context.disableInput();
         ROOT::Each.hide(context, false);
         ROOT::Menus.hide(context, false);
+
+        if (skip_anim)
+        {
+            ROOT::SceneFace.execCommand("setVisible false wheelcolor");
+            end_paint_wheels(context);
+            return;
+        }
 
         if (gtengine::MSpecDB::getPaintColorType(color_id) == 3)
         {
@@ -1021,25 +1172,37 @@ module ROOT
     function end_paint_wheels(context)
     {
         var color_id = sPaintItem.argument1;
-        var color_name = sPaintItem.item_name;
         ROOT::SceneFace.execCommand("setCarWheelVariationExtra 0 car1");
         ROOT::SceneFace.execCommand("swapCarWheelExtraColor %{color_id} -1 -1 -1 car1");
 
+        ROOT::Menus.setMenuIcons(context, PaintWheelsRevertBackMenu);
+        Menus.appear(context, false);
+        context.event_mask = 5;
+        context.enableInput();
+        context.cursor_visible = true;
+    }
+
+    function apply_paint_wheels(context)
+    {
+        //mm: shenanigans here to make it so if you skipped the money check before, nothing goes weird
+        ROOT::PayMoney(context, ROOT::sWagesList.paint_body, nil, true);
+
+        var color_id = sPaintItem.argument1;
         ROOT::sRidingCar.setWheelPaintColor(0, color_id);
         ROOT::sRidingCar.rainX = 0.0;
         ROOT::sRidingCar.dirtiness = 0.0;
         ROOT::UpdateRidingCar();
-        GameItemUtil::ItemBox::delete2(ROOT::sPaintItem);
+
+        //mm: hold R1, no paint usage
+        var state = context.getUpdateContext().getPadButtonState(0);
+        if (!(state & 0x800))
+            GameItemUtil::ItemBox::delete2(ROOT::sPaintItem);
 
         ROOT::sPaintItem = nil;
         ROOT::sNeedCapture = true;
         ROOT::sNeedCleanDirtiness = true;
 
-        ROOT::Menus.setMenuIcons(context, BackMenus);
-        Menus.appear(context, false);
-        context.event_mask = 5;
-        context.enableInput();
-        context.cursor_visible = true;
+        ROOT::go_shop_front(context);
     }
 
     function on_change_wheels(context, focus_index)
@@ -1135,10 +1298,14 @@ module ROOT
     {
         main::sound.play("ok");
 
-        var message = wheel_icon.is_revert_icon_ ? "MESSAGE_WANT_TO_REVERT_DEFAULT_WHEELS" : "MESSAGE_WANT_TO_CHANGE_THIS_WHEELS";
-        var accept = DialogUtil::openConfirmDialog(context, DialogUtil::YESNO, context.translate(ROOT, message));
-        if (!accept)
-            return;
+        var state = context.getUpdateContext().getPadButtonState(0);
+        if (!(state & 0x100)) //mm: hold L1 to skip dialog
+        {
+            var message = wheel_icon.is_revert_icon_ ? "MESSAGE_WANT_TO_REVERT_DEFAULT_WHEELS" : "MESSAGE_WANT_TO_CHANGE_THIS_WHEELS";
+            var accept = DialogUtil::openConfirmDialog(context, DialogUtil::YESNO, context.translate(ROOT, message));
+            if (!accept)
+                return;
+        }
 
         var have_paid = ROOT::PayMoney(context, ROOT::sWagesList.change_wheels);
         if (!have_paid)
@@ -1222,9 +1389,13 @@ module ROOT
 
         main::sound.play("ok");
 
-        var accept = DialogUtil::openConfirmDialog(context, DialogUtil::YESNO, context.translate(ROOT, "MESSAGE_DO_YOU_TRY_NEW_AERO"));
-        if (!accept)
-            return;
+        var state = context.getUpdateContext().getPadButtonState(0);
+        if (!(state & 0x100)) //mm: hold L1 to skip dialog
+        {
+            var accept = DialogUtil::openConfirmDialog(context, DialogUtil::YESNO, context.translate(ROOT, "MESSAGE_DO_YOU_TRY_NEW_AERO"));
+            if (!accept)
+                return;
+        }
 
         var have_paid = ROOT::PayMoney(context, total_price);
         if (!have_paid)
@@ -1315,9 +1486,20 @@ module ROOT
         if (!have_paid)
             return;
 
+        var skip_anim = false;
+        var state = context.getUpdateContext().getPadButtonState(0);
+        if (state & 0x100)
+            skip_anim = true;
+
         context.cursor_visible = false;
         context.event_mask = 5;
         context.disableInput();
+
+        if (skip_anim)
+        {
+            end_engine_overhaul(context);
+            return;
+        }
 
         ROOT::PP_PS_Change.hide(context, false);
         ROOT::Each.hide(context, false);
@@ -1401,9 +1583,20 @@ module ROOT
         if (!have_paid)
             return;
 
+        var skip_anim = false;
+        var state = context.getUpdateContext().getPadButtonState(0);
+        if (state & 0x100)
+            skip_anim = true;
+
         context.cursor_visible = false;
         context.event_mask = 5;
         context.disableInput();
+
+        if (skip_anim)
+        {
+            end_refresh_bodyrigidity(context);
+            return;
+        }
 
         ROOT::Each.hide(context, false);
         ROOT::Menus.hide(context, false);
@@ -1527,10 +1720,17 @@ module ROOT
     function start_racing_modify(context, index, icon)
     {
         main::sound.play("ok");
-        
-        var accept = DialogUtil::openConfirmDialog(context, DialogUtil::DEFAULT_NO, context.translate(ROOT, "MESSAGE_CONFIRM_MODIFY"));
-        if (!accept)
-            return;
+
+        var state = context.getUpdateContext().getPadButtonState(0);
+        if (!(state & 0x100)) //mm: hold L1 to skip dialog
+        {
+            var rm_name = gtengine::MSpecDB::getCarName(ROOT::sRM.getCarCode());
+            var accept = DialogUtil::openConfirmDialog(context, DialogUtil::DEFAULT_NO,
+                context.translate(ROOT, "MESSAGE_CONFIRM_MODIFY")+
+                "\n\nYour car will be converted into\n%{rm_name}");
+            if (!accept)
+                return;
+        }
 
         var have_paid = ROOT::PayMoney(context, ROOT::sWagesList.racing_modify);
         if (!have_paid)
@@ -1539,9 +1739,21 @@ module ROOT
             return;
         }
 
+        var skip_anim = false;
+        state = context.getUpdateContext().getPadButtonState(0);
+        if (state & 0x100)
+            skip_anim = true;
+
         context.cursor_visible = false;
         context.event_mask = 5;
         context.disableInput();
+
+        if (skip_anim)
+        {
+            ROOT::SceneFace.changeCar(ROOT::sRM, 0);
+            end_racing_modify(context);
+            return;
+        }
 
         ROOT::PP_PS_Change.hide(context, false);
         ROOT::Each.hide(context, false);
@@ -1674,6 +1886,16 @@ module ROOT
     static RacingModifyMenus = [
         ShopMenuIcon("icon_racingmodify", "RACING_MODIFY_START", nil, start_racing_modify,  go_shop_front, nil), 
         ShopMenuIcon("icon_back",         "BACK",                nil, return_to_shop_front, go_shop_front, nil)
+    ];
+
+    static PaintBodyRevertBackMenu = [
+        ShopMenuIcon("icon_back", "REVERT_PAINT", nil, on_paint_body_revert, go_shop_front, nil),
+        ShopMenuIcon("icon_paintbody", "APPLY", nil, apply_paint_body, go_shop_front, nil)
+    ];
+
+    static PaintWheelsRevertBackMenu = [
+        ShopMenuIcon("icon_back", "REVERT_PAINT", nil, on_paint_wheels_revert, go_shop_front, nil),
+        ShopMenuIcon("icon_paintwheels", "APPLY", nil, apply_paint_wheels, go_shop_front, nil)
     ];
 
     static BackMenus = [
