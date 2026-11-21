@@ -1451,7 +1451,9 @@ module ROOT::ColorSelect
             return EVENTRESULT_FILTER;
         }
 
-        if (true /*pdiext::isQABuild()*/ && event.keysym == CELL_PAD_CTRL_TRIANGLE)
+        //mm: rebind QA cheat to R1+Start
+        var state = context.getUpdateContext().getPadButtonState(0);
+        if (state & 0x800 && event.keysym == CELL_PAD_CTRL_TRIANGLE)
         {
             if (self.car_code_ == nil)
                 return EVENTRESULT_CONTINUE;

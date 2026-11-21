@@ -151,15 +151,14 @@ module ROOT
 
     method onKeyPress(context, event)
     {
-        if (true /*pdiext::isQABuild()*/)
+        //mm: rebind QA cheat to R1+Start
+        var state = context.getUpdateContext().getPadButtonState(0);
+        if (state & 0x800 && event.keysym == CELL_PAD_CTRL_START)
         {
-            if (event.keysym == CELL_PAD_CTRL_START)
-            {
-                main::sound.play("next");
-                sCheatRegistered = true;
+            main::sound.play("next");
+            sCheatRegistered = true;
 
-                return EVENTRESULT_FILTER;
-            }
+            return EVENTRESULT_FILTER;
         }
 
         if (!ROOT::GameSelect.insensitive)

@@ -62,21 +62,32 @@ function deleteSelected(context, item_list, args, callback, item_w)
 
 function use(context, item, args, callback, item_w)
 {
-    if (!QUERY1(context, ROOT, "QUERY_ITEM_USE", item["item_name"]))
+    //mm: hold R1 to not consume ticket
+    var state = context.getUpdateContext().getPadButtonState(0);
+    var text = context.translate(ROOT, "MyHome", "QUERY_ITEM_USE").build(item["item_name"]);
+    if (state & 0x800)
+    {
+        text += "\n(DEBUG MODE - Ticket will not be removed)"
+    }
+
+    if (!DialogUtil::openConfirmDialog(context, DialogUtil::YESNO, text))
         return false;
 
     if (!useItem(context, item))
         return false;
 
-    if (!GameItemUtil::ItemBox::delete2(item))
+    if (!(state & 0x800))
     {
-        ERROR(context, ROOT, "MSG_FAILED");
-        return false;
+        if (!GameItemUtil::ItemBox::delete2(item))
+        {
+            ERROR(context, ROOT, "MSG_FAILED");
+            return false;
+        }
+
+        --item.count;
     }
 
     saveNow(context);
-
-    --item.count;
 
     callbackIf(context, callback, item, item_w);
     return true;
@@ -241,12 +252,14 @@ function usePresentCarTicket(context, item)
         var garage_id = GAME_STATUS.user_profile.garage.addCar(cp);
 
         var car_label = cp.getCarLabel();
-        var invalid_car = !DLCUtil::Car::isAvailable(car_label);
+
+        //mm: don't validate DLC (should be unnecessary, but whatever)
+        /*var invalid_car = !DLCUtil::Car::isAvailable(car_label);
 
         if (invalid_car)
-            GAME_STATUS.user_profile.garage.setInvalid([car_label], true);
+            GAME_STATUS.user_profile.garage.setInvalid([car_label], true);*/
 
-        CarDeliveryRoot.open(context, cp, garage_id, invalid_car);
+        CarDeliveryRoot.open(context, cp, garage_id, false /*invalid_car*/);
     }
 
     else

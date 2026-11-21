@@ -1174,7 +1174,9 @@ module ROOT::CarDetail
                 status = EVENTRESULT_STOP;
         }
 
-        if (true /*pdiext::isQABuild()*/ && event.keysym == CELL_PAD_CTRL_START)
+        //mm: rebind QA cheat to R1+Start
+        var state = context.getUpdateContext().getPadButtonState(0);
+        if (state & 0x800 && event.keysym == CELL_PAD_CTRL_START)
         {
             ROOT.buyUsedCar(context, self.cp_, self.price_, self.sold_out_, self.new_flag_, self.seed_, self.min_seed_, true);
             return EVENTRESULT_FILTER;
