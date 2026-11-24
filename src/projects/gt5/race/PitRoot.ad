@@ -283,6 +283,17 @@ module ROOT
     {
         method onActivate(context)
         {
+            if (gSequenceCondition.gp.championship == true &&
+                gSequenceCondition.gp.event_index >= gSequenceCondition.gp.events.size - 1)
+            {
+                main::sound.play("disable");
+                ORG.pauseInSaveSequence(true);
+                DialogUtil::openConfirmDialog(context, DialogUtil::ERROR, 
+                    context.translate(ROOT, "QuickMenu", "SUSPEND_CHAMPIONSHIP_LAST_RACE"));
+                ORG.pauseInSaveSequence(false);
+                return EVENTRESULT_FILTER;
+            }
+
             main::sound.play("ok");
             ORG.pauseInSaveSequence(true);
             var res = DialogUtil::openConfirmDialog(context, DialogUtil::QUERY, 
