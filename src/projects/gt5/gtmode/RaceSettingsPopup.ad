@@ -555,7 +555,14 @@ module ROOT
             for (var i = 0; i < gp.events.size; i++)
             {
                 if (gp.events[i].race_parameter.complete_type == gtengine::CompleteType::BYLAPS)
-                    gp.events[i].race_parameter.race_limit_laps = ((gp.events[i].race_parameter.race_limit_laps * [0.5, 1.0, 2.0, 3.0, 5.0][lap_mult]) + 0.6).toInt();
+                {
+                    var new_racelaps = ((gp.events[i].race_parameter.race_limit_laps * [0.5, 1.0, 2.0, 3.0, 5.0][lap_mult]) + 0.6).toInt();
+                    gp.events[i].race_parameter.race_limit_laps = new_racelaps;
+                    if (new_racelaps >= 50)
+                    {
+                        gp.events[i].race_parameter.enable_pit = true;
+                    }
+                }
             }
         }
 
@@ -565,7 +572,14 @@ module ROOT
             for (var i = 0; i < gp.events.size; i++)
             {
                 if (gp.events[i].race_parameter.complete_type == gtengine::CompleteType::BYTIME)
-                    gp.events[i].race_parameter.race_limit_minute = ((gp.events[i].race_parameter.race_limit_minute * [0.25, 0.5, 1.0, 1.5, 2.0][time_mult]) + 0.6).toInt();
+                {
+                    var new_racetime = ((gp.events[i].race_parameter.race_limit_minute * [0.25, 0.5, 1.0, 1.5, 2.0][time_mult]) + 0.6).toInt();
+                    gp.events[i].race_parameter.race_limit_minute = new_racetime;
+                    if (new_racetime >= 60)
+                    {
+                        gp.events[i].race_parameter.enable_pit = true;
+                    }
+                }
             }
         }
     }
