@@ -689,6 +689,7 @@ module ROOT::GameSelect
 {
     attribute category_;
     attribute finder_;
+    attribute item_count;
 
     method setCategory(context, category, focused_game_id)
     {
@@ -761,6 +762,7 @@ module ROOT::GameSelect
     {
         var dummy_initial_data = UIKitProject::FinderRoot.InitialData(UIKitProject::FinderRoot.makeCandidates([]));
         self.finder_ = UIKitProject::FinderRoot::setCopy(context, self.Composite, dummy_initial_data, false);
+        self.item_count = 0;
     }
 
     method onFinalize(context)
@@ -824,6 +826,7 @@ module ROOT::GameSelect
 
     method cb_canceled_game(context, finder_data, func_popup_close)
     {
+        item_count = 0;
         main::sound.play("cancel");
         PROJECT::ignorePadEvent(true);
         self.hide(context, false);
@@ -890,7 +893,7 @@ module ROOT::GameSelect
         initial_data.cb_on_cancel_ = self.cb_canceled_game;
         initial_data.cb_focus_enter_ = self.cb_focused_game;
         initial_data.focus_index_ = focus_index;
-        initial_data.v_scrollbar_ = self.Scrollbar::VScrollbar;
+        initial_data.v_scrollbar_ = nil;//self.Scrollbar::VScrollbar;
         initial_data.activate_sound_ = nil;
         return initial_data;
     }
@@ -948,6 +951,9 @@ module ROOT::hidden::GameSelectItem
         }
 
         self.opacity = 1.0;
+
+        if (ROOT::GameSelect.item_count > 9)
+            start_cover_animation(context, false);
     }
 
     method onFocusEnter(context)
@@ -984,6 +990,7 @@ module ROOT::hidden::GameSelectItem
             self.Flyer::Cover::MoveActor.warp();
             self.Level::MoveActor.warp();
         }
+        ROOT::GameSelect.item_count++;
     }
 }
 
