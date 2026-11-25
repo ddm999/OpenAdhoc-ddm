@@ -845,9 +845,12 @@ module ROOT
                 }
 
                 var is_enable = true;
+                var kart_only = false;
 
                 var is_racing_kart = gtengine::MSpecDB::checkGenericFlag("is_racing_kart", car_code);
 
+                //mm: never disable cars
+                /*
                 if (course_data_holder.is_edit_course_)
                 {
                     var edit_course_data = course_data_holder.edit_course_data_;
@@ -876,6 +879,7 @@ module ROOT
                         }
                     }
                 }
+                */
 
                 var course_label = main::gtengine::MSpecDB::getCourseLabel(course_code);
                 if ("newindoorkart" == course_label ||
@@ -883,7 +887,7 @@ module ROOT
                     "newindoorkart_short" == course_label ||
                     "r_newindoorkart_short" == course_label)
                 {
-                    is_enable = is_racing_kart;
+                    kart_only = true;
                 }
 
                 if (is_enable)
@@ -923,14 +927,17 @@ module ROOT
                 }
 
                 var is_invalid = false;
+                //mm: remove invalid check (shouldn't matter)
+                /*
                 if (is_enable && car.isInstanceOf(Garage2::CarParameterProxy))
                 {
                     is_invalid = 0 != car.invalid;
                     is_enable = !is_invalid;
                 }
+                */
 
-
-                if (tab_id == TAB_TYPE::ARCADE && !is_enable)
+                //mm: still hide non-karts in Arcade Only tab on kart tracks
+                if (tab_id == TAB_TYPE::ARCADE && kart_only && !is_racing_kart)
                     continue;
 
                 var car_name = main::gtengine::MSpecDB::getCarShortName(car_code);

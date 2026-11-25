@@ -857,7 +857,8 @@ module ROOT
             var cp = GAME_STATUS.user_profile.garage.getRidingCar();
             var is_racing_kart = gtengine::MSpecDB::checkGenericFlag("is_racing_kart", cp.getCarCode());
 
-            if (course_info.kart_only)
+            //mm: never disable courses for car reasons
+            /*if (course_info.kart_only)
             {
                 if (!is_racing_kart)
                 {
@@ -882,7 +883,7 @@ module ROOT
                     DialogUtil::openConfirmDialog(context, DialogUtil::ERROR, msg);
                     return;
                 }
-            }
+            }*/
 
             if (course_cond == gtengine::CourseCondition::DIRT)
             {
@@ -1715,7 +1716,8 @@ module ROOT
             {
                 var course_label = main::gtengine::MSpecDB::getCourseLabel(course_code);
 
-                if ("newindoorkart" == course_label || 
+                //mm: allow races on kart tracks in cars
+                /*if ("newindoorkart" == course_label || 
                     "r_newindoorkart" == course_label || 
                     "newindoorkart_short" == course_label || 
                     "r_newindoorkart_short" == course_label)
@@ -1730,7 +1732,7 @@ module ROOT
                                      'image' : "image/gt5/thumbnail/practice_onemake_a.dds"];
                     }
                 }
-                else
+                else*/
                 {
                     data_list += ['value' : MODE::ASPEC_ONE_MAKE,
                                  'balloon' : "ASPEC_ONE_MAKE",
