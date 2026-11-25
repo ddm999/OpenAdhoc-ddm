@@ -139,6 +139,20 @@ module ::main
         return branch;
     }
 
+    static sLogFile = "/APP_DATA_RAW/log.txt"
+
+    function PrintToLog(print_text)
+    {
+        // mm: debugging log!
+        // remember to comment out for release!
+        var st = pdistd::ReadFile(sLogFile);
+        text = "";
+        if (st["buffer"] != nil)
+            text = st["buffer"].toString();
+        text += "\n%{print_text}";
+        pdistd::WriteFile(sLogFile, text.getByteData());
+    }
+
     static is_environment_local = -1;
 
     function isEnvironmentLocal()
@@ -246,6 +260,7 @@ function initMenuSystem()
             product_dir = "dev2";
             break;
 
+        case "mmrunviewer":
         default:
             main::PROJECT_ROOT_DIR = "/projects/gt5";
             product_dir = "gt5";
@@ -342,6 +357,8 @@ function execBoot()
 {
     initModules();
 
+    //mm: wipe log
+    pdistd::WriteFile(sLogFile, "".getByteData());
     pdistd::SetFileSystemOptionInt64("/", "PreCopyHddFreeSizeLimit", 32 * 1024 * 1024);
     initArgs();
     initStatic();
