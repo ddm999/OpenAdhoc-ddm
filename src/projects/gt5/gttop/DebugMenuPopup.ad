@@ -814,7 +814,11 @@ module DebugMenuPopup::GarageDetail
         {
             self.current_car_label_list = [];
             if (self.dealer != "")
-                self.current_car_label_list = car_map[self.dealer];
+            {
+                var l = car_map[self.dealer];
+                if (l != nil)
+                    self.current_car_label_list = l;
+            }
             else
             {
                 foreach (|var d, var l| in car_map)
@@ -963,6 +967,10 @@ module DebugMenuPopup::GarageDetail
                     method onValueChanged(context)
                     {
                         self.pulldownValueChanged(context);
+
+                        if (GarageDetail.current_car_label_list.size == 0)
+                            return EVENTRESULT_FILTER;
+
                         var new_car = GarageDetail.current_car_label_list[self.index];
 
                         if (GarageDetail.car != new_car)
