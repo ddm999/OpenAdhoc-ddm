@@ -1699,8 +1699,14 @@ module GTTopRoot::PopupNews
                 "news_time":     nil,
             ];
 
+            // category_id2 options:
+            // 0 = Pinned to top in Popup, not shown in Ticker
+            // 1 = Might be in Popup randomly depending on number of articles, shown in Ticker
+            // 2 = Never shown in Popup, shown in Ticker
             if (cat_id2 == 0)
                 self.news_list.push(news);
+            else if (cat_id2 == 2)
+                continue;
             else
                 optional_pool.push(news);
         }

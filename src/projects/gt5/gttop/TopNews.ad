@@ -43,7 +43,12 @@ module News
         {
             var article = articles[i];
             var cat_id1 = article.getAttribute("category_id1").toInt();
-            if (cat_id1 == 20)
+            var cat_id2 = article.getAttribute("category_id2").toInt();
+            // category_id2 options:
+            // 0 = Pinned to top in Popup, not shown in Ticker
+            // 1 = Might be in Popup randomly depending on number of articles, shown in Ticker
+            // 2 = Never shown in Popup, shown in Ticker
+            if (cat_id2 == 0)
                 continue;
             var cat_name = "";
             if (categories != nil)
