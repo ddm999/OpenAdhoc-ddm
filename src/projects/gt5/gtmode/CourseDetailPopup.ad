@@ -601,12 +601,17 @@ module ROOT
                     switch (gp.event.game_mode)
                     {
                         case gtengine::GameMode::SINGLE_RACE:
+                            data.visible_starttype = 1;
                             data.visible_laps = true;
                             data.visible_consumption = true;
                             break;
 
                         case gtengine::GameMode::DRIFT_ATTACK:
                             data.visible_drift_type = false;
+                            break;
+
+                        case gtengine::GameMode::TIME_ATTACK:
+                            data.visible_starttype = 2;
                             break;
 
                         default:

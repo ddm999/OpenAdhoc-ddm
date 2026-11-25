@@ -90,6 +90,17 @@ module ROOT
         Pane::ScrolledWindow::ScrollClip.updateGeometry();
 
         var Pane_S = self.Pane::ScrolledWindow::ScrollClip::space;
+        var sliderEntry = Pane_S.EntryNum::slider;
+        sliderEntry.decide_callback = onMaxCarsDecide;
+        sliderEntry.range = [2, 16];
+        sliderEntry.index = self.sData.difficultySettings[6];
+        sliderEntry.setup(context);
+
+        var sliderPos = Pane_S.PlayerPos::slider;
+        sliderPos.range = [1, 16];
+        sliderPos.index = self.sData.difficultySettings[7];
+        sliderPos.setup(context);
+
         var sliderA = Pane_S.AIAccelerating::slider;
         sliderA.range = [60, 120];
         sliderA.index = self.sData.difficultySettings[0];
@@ -133,6 +144,20 @@ module ROOT
         OptionMenuUtil::finalize(context, Pane_S.AICatchSlowDistance::OptionMenu);
     }
 
+    method onMaxCarsDecide(context, index, slider)
+    {
+        clampPlayerPos(context, index);
+    }
+
+    method clampPlayerPos(context, index)
+    {
+        var Pane_S = self.Pane::ScrolledWindow::ScrollClip::space;
+        Pane_S.PlayerPos::slider.max = index;
+        if (Pane_S.PlayerPos::slider.index > index)
+            Pane_S.PlayerPos::slider.index = index;
+        Pane_S.PlayerPos::slider.setup(context);
+    }
+
     method apply(context)
     {
         var Pane_S = self.Pane::ScrolledWindow::ScrollClip::space;
@@ -143,6 +168,8 @@ module ROOT
         self.sData.difficultySettings[3] = Pane_S.AISlowdown::slider.index;
         self.sData.difficultySettings[4] = Pane_S.AICatchup::slider.index;
         self.sData.difficultySettings[5] = Pane_S.AICatchSlowDistance::OptionMenu.index;
+        self.sData.difficultySettings[6] = Pane_S.EntryNum::slider.index;
+        self.sData.difficultySettings[7] = Pane_S.PlayerPos::slider.index;
     }
 
     method onCancel(context)

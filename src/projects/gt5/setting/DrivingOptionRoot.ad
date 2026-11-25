@@ -50,6 +50,7 @@ module ROOT
 
         attribute visible_drift_type;
         attribute visible_speed_test_unit_mode;
+        attribute visible_starttype;
         attribute visible_laps;
         attribute visible_onemake;
         attribute visible_consumption;
@@ -107,6 +108,7 @@ module ROOT
 
             self.visible_drift_type = false;
             self.visible_speed_test_unit_mode = false;
+            self.visible_starttype = false;
             self.visible_laps = false;
             self.visible_onemake = false;
             self.visible_consumption = false;
@@ -441,11 +443,41 @@ module ROOT
         return EVENTRESULT_CONTINUE;
     }
 
+    method getStartTypeDefault(rp)
+    {
+        switch (rp.start_type)
+        {
+            case gtengine::StartType::GRID:
+                return 1;
+
+            case gtengine::StartType::ROLLING2:
+                return 2;
+
+            case gtengine::StartType::ROLLING_DL:
+                return 3;
+
+            case gtengine::StartType::PIT:
+                return 4;
+
+            default:
+                return 0;
+        }
+    }
+
     method onInitialize(context)
     {
         var Pane_S = self.Pane::ScrolledWindow::ScrollClip::space;
         self.navigate_insensitive = true;
         Pane.minimum_height = 0;
+
+        // Start Type
+        if (self.sData.rp != nil)
+        {
+            var start_type_def = getStartTypeDefault(self.sData.rp);
+            var start_type_list = ["START_TYPE_GRID", "START_TYPE_ROLLING2", "START_TYPE_ROLLING_DL"];
+            OptionMenuUtil::initialize(context, self, Pane_S.StartType::OptionMenu, hidden::Item, start_type_list, "TrialSetting");
+            Pane_S.StartType::OptionMenu.setIndex(context, start_type_def == 0 ? 0 : start_type_def - 1);
+        }
 
         // Assists
         if (self.sData.dp != nil)
@@ -615,6 +647,7 @@ module ROOT
         OptionMenuUtil::finalize(context, Pane_S.LowMuType::OptionMenu);
         OptionMenuUtil::finalize(context, Pane_S.BehaviorDamageType::OptionMenu);
         OptionMenuUtil::finalize(context, Pane_S.Consumption::OptionMenu);
+        OptionMenuUtil::finalize(context, Pane_S.StartType::OptionMenu);
         OptionMenuUtil::finalize(context, Pane_S.SpecialGAS::OptionMenu);
         OptionMenuUtil::finalize(context, Pane_S.NOS::OptionMenu);
 
@@ -739,6 +772,15 @@ module ROOT
         }
         else
             Pane_S.Laps.visible = false;
+
+        if (self.sData.visible_starttype != false)
+        {
+            Pane_S.StartType.visible = true;
+        }
+        else
+        {
+            Pane_S.StartType.visible = false;
+        }
 
         if (self.sData.visible_drift_type)
         {
@@ -959,6 +1001,32 @@ module ROOT
 
         if (self.sData.visible_laps && self.sData.rp != nil)
             self.sData.rp.race_limit_laps = Pane_S.Laps::slider.index;
+
+        if (self.sData.visible_starttype != false && self.sData.rp != nil)
+        {
+            var start_type = Pane_S.StartType::OptionMenu.index + 1;
+            switch (start_type)
+            {
+                case 1:
+                    self.sData.rp.start_type = gtengine::StartType::GRID;
+                    break;
+
+                case 2:
+                    self.sData.rp.start_type = gtengine::StartType::ROLLING2;
+                    break;
+
+                case 3:
+                    self.sData.rp.start_type = gtengine::StartType::ROLLING_DL;
+                    self.sData.rp.time_to_start = 10000;
+                    break;
+
+                case 4:
+                    self.sData.rp.start_type = gtengine::StartType::PIT;
+
+                default:
+                    break;
+            }
+        }
 
         if (self.sData.visible_consumption && self.sData.rp != nil)
         {

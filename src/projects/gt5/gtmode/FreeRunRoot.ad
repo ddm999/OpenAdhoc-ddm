@@ -327,8 +327,11 @@ module ROOT
         data.visible_behavior_damage_type = true;
 
         if (gp.event.game_mode == gtengine::GameMode::FREE_RUN)
+        {
             data.visible_consumption = true;
-        
+            data.visible_starttype = 2;
+        }
+
         if (gp.event.game_mode == gtengine::GameMode::DRIFT_ATTACK && gp.event.track.course_pathway == nil)
             data.visible_drift_type = true;
 
@@ -336,6 +339,7 @@ module ROOT
         {
             data.visible_laps = true;
             data.visible_consumption = true;
+            data.visible_starttype = 1;
         }
 
         var res = SettingProject::DrivingOptionRoot.OpenDialog(context, data);
