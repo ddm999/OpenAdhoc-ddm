@@ -21,6 +21,13 @@ module ROOT
     {
         var course_info = CourseData::getCourseInfo(course_code);
 
+        //mm: hack bc course info isn't working for added templates
+        var course_label = gtengine::MSpecDB::getCourseLabel(course_code);
+        if (course_label.beginWith("template"))
+        {
+            return context.translate(ROOT, "CourseName", course_label);
+        }
+
         if (course_info.is_reverse)
         {
             return "%s / %s".format(
@@ -97,9 +104,14 @@ module ROOT
             DetailPopup2::Pane::Body::ImageFace.image_path = "piece/replay_thumb/%s.img".format(course_info.map);
 
             DetailPopup2::Pane::Body::ImageFaceLogo.image_path = "piece/course_logo_S/%s.img".format(course_info.logo);
+            
 
             if (course_label.beginWith("template"))
+            {
                 DetailPopup2::Pane::Body::Map.visible = false;
+                //mm: hack bc course info isn't working for added templates
+                DetailPopup2::Pane::Body::ImageFace.image_path = "piece/replay_thumb/%s.img".format(course_label);
+            }
             else
             {
                 DetailPopup2::Pane::Body::Map.visible = true;
