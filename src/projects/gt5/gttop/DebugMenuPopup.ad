@@ -1264,7 +1264,11 @@ module DebugMenuPopup::Template::ScrolledWindow::clip::space::AllTopSceneAvailab
         foreach (var flag in default_flags)
             GAME_STATUS.user_profile.game_flags.setFlag("TOP_SCENES", flag, true);
 
-        if (res == DialogUtil::RESULT_YES)
+        if (res == DialogUtil::RESULT_CLOSE)
+        {
+            PROJECT.history['GTModeRoot::DebugScenes'] = false;
+        }
+        else if (res == DialogUtil::RESULT_YES)
         {
             foreach (var flag in extra_flags)
                 GAME_STATUS.user_profile.game_flags.setFlag("TOP_SCENES", flag, true);
