@@ -864,10 +864,10 @@ module PROJECT
             entry_set.entry_generate.entry_num = gMasterDifficultySettings[6];
             rp.entry_max = gMasterDifficultySettings[6];
             rp.racers_max = gMasterDifficultySettings[6];
-            var player_pos = gMasterDifficultySettings[7]-1;
-            if (player_pos >= gMasterDifficultySettings[6]-1)
-                player_pos = gMasterDifficultySettings[6]-1;
-            entry_set.entry_generate.player_pos = player_pos;
+            var playerpos = gMasterDifficultySettings[7]-1;
+            if (playerpos >= gMasterDifficultySettings[6]-1)
+                playerpos = gMasterDifficultySettings[6]-1;
+            entry_set.entry_generate.player_pos = playerpos;
             entry_set.entry_generate.ai_skill_accelerating = gMasterDifficultySettings[0];
             entry_set.entry_generate.ai_skill_breaking = gMasterDifficultySettings[1];
             entry_set.entry_generate.ai_skill_cornering = gMasterDifficultySettings[2];
@@ -928,45 +928,44 @@ module PROJECT
         var entry_generate = entry_set.entry_generate;
         var rp = event.race_parameter;
 
-        if (oval)
+        if (GAME_STATUS.user_profile.context.arcade_difficulty != ArcadeProject::DifficultyEnum::MM_PRO)
         {
-            entry_generate.player_pos = entry_generate.entry_num - 1;
-
-            rp.start_type = gtengine::StartType::ROLLING_DL;
-
-
-            var difficulty_name = ["nascar_easy", "nascar_normal", "nascar_pro", "nascar_pro"];
-            var map = gDifficultySetting[difficulty_name[GAME_STATUS.user_profile.context.arcade_difficulty]];
-
-            entry_set.entry_generate.ai_skill = map["ai_skill"];
-
-            rp.setBoostParams(map["boost_f"], map["boost_r"], map["boost_fmax"], map["boost_rmax"], map["boost_fmin"], map["boost_rmin"]);
-        }
-        else
-        {
-            if (course_data_holder.is_edit_course_)
-                rp.start_type = gtengine::StartType::GRID;
-            else
-                rp.start_type = gtengine::StartType::ROLLING2;
-
-            switch (GAME_STATUS.user_profile.context.arcade_difficulty)
+            if (oval)
             {
-                case PROJECT::DifficultyEnum::EASY:
-                    rp.rolling_player_grid = entry_generate.player_pos;
-                    break;
-                case PROJECT::DifficultyEnum::NORMAL:
-                case PROJECT::DifficultyEnum::PRO:
-                    if (entry_generate.entry_num >= 12)
-                        entry_generate.player_pos = 11;
-                    else
-                        entry_generate.player_pos = entry_generate.entry_num - 1;
+                entry_generate.player_pos = entry_generate.entry_num - 1;
 
-                    rp.rolling_player_grid = entry_generate.player_pos;
-                    break;
-                case ArcadeProject::DifficultyEnum::MM_PRO:
-                    entry_generate.player_pos = entry_generate.entry_num - 1;
-                    rp.rolling_player_grid = entry_generate.player_pos;
-                    break;
+                rp.start_type = gtengine::StartType::ROLLING_DL;
+
+
+                var difficulty_name = ["nascar_easy", "nascar_normal", "nascar_pro", "nascar_pro"];
+                var map = gDifficultySetting[difficulty_name[GAME_STATUS.user_profile.context.arcade_difficulty]];
+
+                entry_set.entry_generate.ai_skill = map["ai_skill"];
+
+                rp.setBoostParams(map["boost_f"], map["boost_r"], map["boost_fmax"], map["boost_rmax"], map["boost_fmin"], map["boost_rmin"]);
+            }
+            else
+            {
+                if (course_data_holder.is_edit_course_)
+                    rp.start_type = gtengine::StartType::GRID;
+                else
+                    rp.start_type = gtengine::StartType::ROLLING2;
+
+                switch (GAME_STATUS.user_profile.context.arcade_difficulty)
+                {
+                    case PROJECT::DifficultyEnum::EASY:
+                        rp.rolling_player_grid = entry_generate.player_pos;
+                        break;
+                    case PROJECT::DifficultyEnum::NORMAL:
+                    case PROJECT::DifficultyEnum::PRO:
+                        if (entry_generate.entry_num >= 12)
+                            entry_generate.player_pos = 11;
+                        else
+                            entry_generate.player_pos = entry_generate.entry_num - 1;
+
+                        rp.rolling_player_grid = entry_generate.player_pos;
+                        break;
+                }
             }
         }
 
